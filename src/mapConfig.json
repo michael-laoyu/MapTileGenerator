@@ -1,0 +1,18 @@
+﻿{
+	"resolutions" :   [128, 64],
+	"tileSize" : [256,256],
+	"extent" : [12662882.864568064,2543518.577818389,12761187.939702341,2599303.8005401082],
+	"origin": [0,0],
+	"wmsUrl": "http://localhost:8080/geoserver/szgas/wms",
+	"offsetZoom" :11,
+	"wmsParas" : {
+		"FORMAT" : "image/png",
+		"VERSION" : "1.1.1",
+		"STYLES" : "",
+		"LAYERS" : "szgas:jd_baidu",
+		"REQUEST" : "GetMap",
+		"SRS" : "EPSG:3857",
+		"TRANSPARENT" : true
+	},
+	"runThreadCount" : 1,
+}
