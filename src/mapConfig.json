@@ -1,5 +1,5 @@
 ﻿{
-	"resolutions" :   [128, 64],
+	"resolutions" :   [128, 64,32],
 	"tileSize" : [256,256],
 	"extent" : [12662882.864568064,2543518.577818389,12761187.939702341,2599303.8005401082],
 	"origin": [0,0],
@@ -14,5 +14,6 @@
 		"SRS" : "EPSG:3857",
 		"TRANSPARENT" : true
 	},
-	"runThreadCount" : 1,
+	"runThreadCount" : 5,
+	"savePath" : ""
 }

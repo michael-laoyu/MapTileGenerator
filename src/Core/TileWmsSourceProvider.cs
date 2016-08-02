@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace MapTileGenerator.Core
 {
-    public class TileWmsSourceProvider
+    public class TileWmsSourceProvider : MapTileGenerator.Core.ISourceProvider
     {
         private TileGrid _tileGrid = null;
         private string _url = null;

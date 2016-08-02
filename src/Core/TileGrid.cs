@@ -13,6 +13,7 @@ namespace MapTileGenerator.Core
         private Coordinate _origin;
         private Size _tileSize;
         private List<Extent> _tileRanges = null;
+        private double _tileTotal = 0;
 
         public TileGrid(double[] resolutions, Extent extent, Coordinate origin,Size tileSize)
         {
@@ -31,6 +32,7 @@ namespace MapTileGenerator.Core
                 var leftBottomTileCoord = GetTileCoordByXYAndZoom(i, this._extent.GetLeftBottom(), false);
                 var rightTopTileCoord = GetTileCoordByXYAndZoom(i, this._extent.GetTopRight(), true);
                 result.Add(new Extent(leftBottomTileCoord, rightTopTileCoord));
+                _tileTotal += (rightTopTileCoord.X - leftBottomTileCoord.X +1 ) * (rightTopTileCoord.Y - leftBottomTileCoord.Y +1);
             }
             return result;
         }
@@ -74,6 +76,14 @@ namespace MapTileGenerator.Core
             get
             {
                 return _tileRanges;
+            }
+        }
+
+        public double TileTotal
+        {
+            get
+            {
+                return _tileTotal;
             }
         }
 

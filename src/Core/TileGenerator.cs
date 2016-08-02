@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -10,13 +11,15 @@ namespace MapTileGenerator.Core
 {
     public class TileGenerator : IDisposable
     {
-        private TileWmsSourceProvider _source = null;
         private int _threadCount = 1;
         private string _savePath;
         private int _offsetZoom = 0;
         private bool _isStop = false;
-        private List<WorThread> _workThreads = null;
-        private List<ManualResetEvent> _waitOnes = null;
+        private ITilePathBuilder _tilePathBuilder = null;
+        private ISourceProvider _source = null;
+        private BlockingCollection<TileCoord> _blockingQueue = null;
+        private CancellationTokenSource _tokenSource = null;
+
         public EventHandler<TileCoord> TileLoaded;
 
         public TileGenerator(MapConfig config)
@@ -54,6 +57,15 @@ namespace MapTileGenerator.Core
             _threadCount = config.RunThreadCount;
             _savePath = config.SavePath;
             _offsetZoom = config.OffsetZoom;
+            _tilePathBuilder = new DefaultTilePathBuilder(_savePath);
+        }
+
+        public ISourceProvider Source
+        {
+            get
+            {
+                return _source;
+            }
         }
 
         protected virtual void OnTileLoaded(TileCoord tileCoord)
@@ -64,80 +76,65 @@ namespace MapTileGenerator.Core
             }
         }
 
-        private Coordinate GetTileCoord()
-        {
-            List<Extent> fullTileRange = _source.TileGrid.TileRanges;
-            int zIndex = 0;
-            double xIndex = fullTileRange[zIndex].MinX;
-            double yIndex = fullTileRange[zIndex].MinY;
-            return null;
-        }
-
         public void Start()
         {
             if (!_isStop)
             {
-                _workThreads = new List<WorThread>(_threadCount);
-                _waitOnes = new List<ManualResetEvent>(_threadCount);
+                _blockingQueue = new BlockingCollection<TileCoord>(_threadCount);
+                _tokenSource = new CancellationTokenSource();
+                var token = _tokenSource.Token;
+                var taskFactory = new TaskFactory(TaskCreationOptions.LongRunning, TaskContinuationOptions.LongRunning);
+
                 for (int i = 0; i < _threadCount; i++)
                 {
-                    ManualResetEvent waitOne = new ManualResetEvent(false);
-                    WorThread workThread = new WorThread(waitOne, (tileCoord )=>
+                    Task workThread = taskFactory.StartNew(() =>
                     {
-                        using (Stream stream = _source.GetTile(tileCoord))
+                        while (!_isStop)
                         {
-                             string filePath ;
-                            string z= (tileCoord.Zoom + _offsetZoom).ToString(),
-                                x=tileCoord.X.ToString(),
-                                y=tileCoord.Y.ToString();
+                            token.ThrowIfCancellationRequested();
 
-                            filePath = Path.Combine(_savePath, z);
-                            if(tileCoord.X <0)
+                            TileCoord tileCoord = null;
+                            if(_blockingQueue.TryTake(out tileCoord, 100))
+                            //tileCoord = _blockingQueue.Take();
+                            //if (tileCoord != null)
                             {
-                                x= "M" + Math.Abs(tileCoord.X).ToString();
-                            }
-                            if(tileCoord.Y<0)
-                            {
-                                y= "M" + Math.Abs(tileCoord.Y).ToString();
-                            }
-                            filePath = Path.Combine(filePath, x + "_" + y + ".png");
-                            using(FileStream fs = new FileStream(filePath,FileMode.OpenOrCreate,FileAccess.ReadWrite))
-                            {
-                                int ret = 0;
-                                byte[] buffer = new byte[8192];//8K
-                                ret = stream.Read(buffer, 0, buffer.Length);
-                                while (ret > 0)
+                                using (Stream stream = _source.GetTile(tileCoord))
                                 {
-                                    fs.Write(buffer, 0, ret);
-                                    ret = stream.Read(buffer, 0, buffer.Length);
+                                    string filePath = _tilePathBuilder.BuildTilePath(tileCoord);
+                                    using (FileStream fs = new FileStream(filePath, FileMode.OpenOrCreate, FileAccess.ReadWrite))
+                                    {
+                                        int ret = 0;
+                                        byte[] buffer = new byte[8192];//8K
+                                        ret = stream.Read(buffer, 0, buffer.Length);
+                                        while (ret > 0)
+                                        {
+                                            fs.Write(buffer, 0, ret);
+                                            ret = stream.Read(buffer, 0, buffer.Length);
+                                        }
+                                        OnTileLoaded(tileCoord);
+                                    }
                                 }
-                                OnTileLoaded(tileCoord);
                             }
-                        }                        
-                    });
-                    _workThreads.Add(workThread);
-                    _waitOnes.Add(waitOne);
-                    workThread.Start();
+                            //else
+                            //{
+                            //    token.WaitHandle.WaitOne(100);
+                            //}
+                        }
+                    }, token);
                 }
 
                 List<Extent> fullTileRange = _source.TileGrid.TileRanges;
-                TileCoord tile;
-                int workThreadIndex = 0;
                 for (int z = 0; z < fullTileRange.Count; z++)
                 {
-                    string filePath = Path.Combine(_savePath, (z+_offsetZoom).ToString());
-                    if (!Directory.Exists(filePath))
-                    {
-                        Directory.CreateDirectory(filePath);
-                    }
+                   _tilePathBuilder.BuildZoomFold(z, _offsetZoom);
+
                     for (double x = fullTileRange[z].MinX; x <= fullTileRange[z].MaxX; ++x)
                     {
                         for (double y = fullTileRange[z].MinY; y <= fullTileRange[z].MaxY; ++y)
                         {
-                            tile = new TileCoord(z, x, y);
-                            workThreadIndex = workThreadIndex % _threadCount;
-                            _workThreads[workThreadIndex].Enqueue(tile);
-                            ++workThreadIndex;
+                            var tile = new TileCoord(z, x, y);
+                            //_blockingQueue.TryAdd(tile, 500);
+                            _blockingQueue.Add(tile);
                         }
                     }
                 }
@@ -148,14 +145,14 @@ namespace MapTileGenerator.Core
         {
             try
             {
-                if (_workThreads != null && _workThreads.Count > 0)
+                _isStop = true;
+                if (_tokenSource != null)
                 {
-                    foreach (WorThread item in _workThreads)
-                    {
-                        item.Dispose();
-                    }
-                    _workThreads.Clear();
-                    _workThreads = null;
+                    _tokenSource.Cancel();
+                }
+                if (_blockingQueue != null)
+                {
+                    _blockingQueue.Dispose();
                 }
             }
             catch (Exception ex)
@@ -173,93 +170,6 @@ namespace MapTileGenerator.Core
 
         #endregion
 
-        public class WorThread : IDisposable
-        {
-            private Thread _thread = null;
-            private bool _isStop = false;
-            private ManualResetEvent _waitOne = null;
-            private Queue<TileCoord> _tileQueue = new Queue<TileCoord>();
-            private Action<TileCoord> _callback = null;
-            public WorThread(ManualResetEvent waitOne,Action<TileCoord> callback)
-            {
-                _waitOne = waitOne;
-                _callback = callback;
-                _thread = new Thread(() =>
-                {
-                    while (!_isStop)
-                    {
-                        TileCoord tileCoor = Dequeue();
-                        if (tileCoor != null)
-                        {
-                            _callback(tileCoor);
-                        }
-                        else
-                        {
-                            _waitOne.Reset();
-                            _waitOne.WaitOne();
-                        }
-                    }
-                });
-                _thread.IsBackground = true;
-            }
-
-            protected virtual TileCoord Dequeue()
-            {
-                lock (_tileQueue)
-                {
-                    if (_tileQueue.Count > 0)
-                    {
-                        return _tileQueue.Dequeue();
-                    }
-                }
-                return null;
-            }
-
-            public void Enqueue(TileCoord tileCoord)
-            {
-                lock (_tileQueue)
-                {
-                    _tileQueue.Enqueue(tileCoord);
-                    _waitOne.Set();
-                }
-            }
-
-            public void Start()
-            {
-                try
-                {
-                    _thread.Start();
-
-                }
-                catch (Exception ex)
-                {
-                    Console.WriteLine(ex.Message);
-                }
-            }
-
-            #region IDisposable 成员
-
-            public void Dispose()
-            {
-                try
-                {
-                    _isStop = true;
-                    if (_thread != null)
-                    {
-                        _thread.Join(10);
-                        //_thread.Abort();
-                        _thread = null;
-                    }
-                    _waitOne.Close();
-                    GC.SuppressFinalize(this);
-                }
-                catch (Exception ex)
-                {
-                    Console.WriteLine(ex.Message);
-                }
-            }
-
-            #endregion
-        }
+       
     }
 }

@@ -43,9 +43,12 @@
     <Reference Include="System.Data" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Core\DefaultTilePathBuilder.cs" />
     <Compile Include="Core\Extent.cs" />
     <Compile Include="Core\HttpTileLoadStrategy.cs" />
+    <Compile Include="Core\ISourceProvider.cs" />
     <Compile Include="Core\ITileLoadStrategy.cs" />
+    <Compile Include="Core\ITilePathBuilder.cs" />
     <Compile Include="MapConfig.cs" />
     <Compile Include="Core\TileGenerator.cs" />
     <Compile Include="Core\TileGrid.cs" />
