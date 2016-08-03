@@ -1,5 +1,5 @@
 # MapTileGenerator
-结合WMS服务的切图工具
+利用WMS、WMTS、及其他方式进行瓦片下载或切图的工具！
 
 ##使用说明：
 设置mapConfig.json，根据配置项请求WMS服务进行切片，支持多线程方式。
@@ -15,11 +15,13 @@
 		
 		"origin": [0,0],
 		
-		"wmsUrl": "http://localhost:8080/geoserver/szgas/wms",
-		
 		"offsetZoom" :11, //ZOOM级别的偏移值，保存瓦片时以zoom + offsetZoom保存路径;
 		
-		"wmsParas" : {
+		"type" : "WMS",  //支持WMS，WMTS，暂时只支持两种；
+		
+		"url": "http://localhost:8080/geoserver/szgas/wms",
+		
+		"urlParas" : {
 		
 			"FORMAT" : "image/png",
 			
