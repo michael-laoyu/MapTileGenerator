@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace MapTileGenerator.Core
 {
-    interface ITileLoadStrategy
+   public  interface ITileLoadStrategy
     {
         Stream GetTile(string url);
     }

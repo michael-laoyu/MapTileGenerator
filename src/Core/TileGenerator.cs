@@ -24,37 +24,12 @@ namespace MapTileGenerator.Core
 
         public TileGenerator(MapConfig config)
         {
-            if (config.TileSize == null)
-            {
-                config.TileSize = new int[] { 256, 256 };
-            }
-            var tileSize = new Size(config.TileSize);
-            var extent = new Extent(config.Extent);
-            Coordinate origin;
-            if (config.Origin == null)
-            {
-                origin = extent.GetTopLeft();
-            }
-            else
-            {
-                origin = new Coordinate(config.Origin);
-            }
+            _source = SourceProviderFactory.CreateSourceProvider(config);
+            _threadCount = config.RunThreadCount;
             if (string.IsNullOrEmpty(config.SavePath))
             {
                 config.SavePath = Path.Combine(Environment.CurrentDirectory, "Tiles");
             }
-
-            var tileGrid = new TileGrid(config.Resolutions, extent, origin, tileSize);
-            var paras = new Dictionary<string,object>();
-            paras.Add("FORMAT", config.Paras.Format);
-            paras.Add("VERSION", config.Paras.Version);
-            paras.Add("STYLES", config.Paras.Style);
-            paras.Add("LAYERS", config.Paras.Layers);
-            paras.Add("REQUEST", config.Paras.Request);
-            paras.Add("SRS", config.Paras.Srs);
-
-            _source = new TileWmsSourceProvider(tileGrid, config.Url, paras);
-            _threadCount = config.RunThreadCount;
             _savePath = config.SavePath;
             _offsetZoom = config.OffsetZoom;
             _tilePathBuilder = new DefaultTilePathBuilder(_savePath);
@@ -94,25 +69,32 @@ namespace MapTileGenerator.Core
                             token.ThrowIfCancellationRequested();
 
                             TileCoord tileCoord = null;
-                            if(_blockingQueue.TryTake(out tileCoord, 100))
+                            if (_blockingQueue.TryTake(out tileCoord, 100))
                             //tileCoord = _blockingQueue.Take();
                             //if (tileCoord != null)
                             {
-                                using (Stream stream = _source.GetTile(tileCoord))
+                                try
                                 {
-                                    string filePath = _tilePathBuilder.BuildTilePath(tileCoord);
-                                    using (FileStream fs = new FileStream(filePath, FileMode.OpenOrCreate, FileAccess.ReadWrite))
+                                    using (Stream stream = _source.GetTile(tileCoord))
                                     {
-                                        int ret = 0;
-                                        byte[] buffer = new byte[8192];//8K
-                                        ret = stream.Read(buffer, 0, buffer.Length);
-                                        while (ret > 0)
+                                        string filePath = _tilePathBuilder.BuildTilePath(tileCoord);
+                                        using (FileStream fs = new FileStream(filePath, FileMode.OpenOrCreate, FileAccess.ReadWrite))
                                         {
-                                            fs.Write(buffer, 0, ret);
+                                            int ret = 0;
+                                            byte[] buffer = new byte[8192];//8K
                                             ret = stream.Read(buffer, 0, buffer.Length);
+                                            while (ret > 0)
+                                            {
+                                                fs.Write(buffer, 0, ret);
+                                                ret = stream.Read(buffer, 0, buffer.Length);
+                                            }
+                                            OnTileLoaded(tileCoord);
                                         }
-                                        OnTileLoaded(tileCoord);
                                     }
+                                }
+                                catch (Exception ex)
+                                {
+                                    Console.WriteLine(ex.Message);
                                 }
                             }
                             //else
@@ -123,21 +105,15 @@ namespace MapTileGenerator.Core
                     }, token);
                 }
 
-                List<Extent> fullTileRange = _source.TileGrid.TileRanges;
-                for (int z = 0; z < fullTileRange.Count; z++)
-                {
-                   _tilePathBuilder.BuildZoomFold(z, _offsetZoom);
-
-                    for (double x = fullTileRange[z].MinX; x <= fullTileRange[z].MaxX; ++x)
+                _source.EnumerateTileRange(
+                    (zoom) =>
                     {
-                        for (double y = fullTileRange[z].MinY; y <= fullTileRange[z].MaxY; ++y)
-                        {
-                            var tile = new TileCoord(z, x, y);
-                            //_blockingQueue.TryAdd(tile, 500);
-                            _blockingQueue.Add(tile);
-                        }
-                    }
-                }
+                        _tilePathBuilder.BuildZoomFold(zoom, _offsetZoom);
+                    },
+                   (tile) =>
+                   {
+                       _blockingQueue.Add(tile);
+                   });
             }
         }
 

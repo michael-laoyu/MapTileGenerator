@@ -31,6 +31,14 @@ namespace MapTileGenerator.Core
             }
         }
 
+        public Extent(double minX, double minY, double maxX, double maxY)
+        {
+            MinX = minX;
+            MinY = minY;
+            MaxX = maxX;
+            MaxY = maxY;
+        }
+
         public Coordinate GetLeftBottom()
         {
             return new Coordinate(MinX, MinY);
@@ -44,6 +52,11 @@ namespace MapTileGenerator.Core
         public Coordinate GetTopLeft()
         {
             return new Coordinate(MinX, MaxY);
+        }
+
+        public Coordinate GetRightBottom()
+        {
+            return new Coordinate(MaxX, MinY);
         }
 
         public override string ToString()

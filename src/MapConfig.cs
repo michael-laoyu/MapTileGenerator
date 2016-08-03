@@ -109,15 +109,22 @@ namespace MapTileGenerator
             }
         }
 
-        [JsonProperty("wmsUrl")]
+        [JsonProperty("type")]
+        public string Type
+        {
+            get;
+            set;
+        }
+
+        [JsonProperty("url")]
         public string Url
         {
             get;
             set;
         }
 
-        [JsonProperty("wmsParas")]
-        public WmsParas Paras
+        [JsonProperty("urlParas")]
+        public Dictionary<string,object> UrlParas
         {
             get;
             set;

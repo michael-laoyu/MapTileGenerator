@@ -1,17 +1,43 @@
-﻿{
+﻿/*
+Geoserver WMS切片下载配置
+{
 	"resolutions" :   [128, 64,32],
 	"tileSize" : [256,256],
 	"extent" : [12662882.864568064,2543518.577818389,12761187.939702341,2599303.8005401082],
 	"origin": [0,0],
-	"wmsUrl": "http://localhost:8080/geoserver/szgas/wms",
 	"offsetZoom" :11,
-	"wmsParas" : {
+	"type" : "wms",
+	"url": "http://localhost:8080/geoserver/szgas/wms",	
+	"urlParas" : {
 		"FORMAT" : "image/png",
 		"VERSION" : "1.1.1",
 		"STYLES" : "",
 		"LAYERS" : "szgas:jd_baidu",
 		"REQUEST" : "GetMap",
 		"SRS" : "EPSG:3857",
+		"TRANSPARENT" : true
+	},
+	"runThreadCount" : 5,
+	"savePath" : ""
+}
+*/
+//Supermap 天地图WMTS瓦片下载配置
+{
+	"resolutions" :   [ 0.703125,  0.3515625, 0.17578125],
+	"tileSize" : [256,256],
+	"extent" : [-180.0 -90.0,180.0,90.0],
+	"origin": [-180,90],
+	"offsetZoom" :1,
+	"type" : "wmts",
+	"url": "http://172.16.12.15:8080/dfc/services/ogc/wmts/vec",
+	"urlParas" : {
+		"SERVICE" : "WMTS",
+		"FORMAT" : "image/png",
+		"VERSION" : "1.0.0",
+		"STYLES" : "default",
+		"LAYER" : "vec",
+		"REQUEST" : "GetTile",
+		"TileMatrixSet" : "CustomCRS4326Scalevec",
 		"TRANSPARENT" : true
 	},
 	"runThreadCount" : 5,

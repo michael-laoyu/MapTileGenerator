@@ -8,12 +8,12 @@ namespace MapTileGenerator.Core
 {
     public class TileGrid
     {
-        private double[] _resolutions;
-        private Extent _extent;
-        private Coordinate _origin;
-        private Size _tileSize;
-        private List<Extent> _tileRanges = null;
-        private double _tileTotal = 0;
+        protected double[] _resolutions;
+        protected Extent _extent;
+        protected Coordinate _origin;
+        protected Size _tileSize;
+        protected List<Extent> _tileRanges = null;
+        protected double _tileTotal = 0;
 
         public TileGrid(double[] resolutions, Extent extent, Coordinate origin,Size tileSize)
         {
@@ -24,7 +24,7 @@ namespace MapTileGenerator.Core
             this._tileRanges = CalculateTileRanges();
         }
 
-        private List<Extent> CalculateTileRanges()
+        protected  virtual List<Extent> CalculateTileRanges()
         {
             List<Extent> result = new List<Extent>();
             for (int i = 0, len = _resolutions.Length; i < len; i++)
@@ -37,7 +37,7 @@ namespace MapTileGenerator.Core
             return result;
         }
 
-        private Coordinate GetTileCoordByXYAndZoom(int zoom, Coordinate coord, bool reverseIntersectionPolicy)
+        protected virtual Coordinate GetTileCoordByXYAndZoom(int zoom, Coordinate coord, bool reverseIntersectionPolicy)
         {
             var adjustX = reverseIntersectionPolicy ? 0.5 : 0.0;
             var adjustY = reverseIntersectionPolicy ? 0.0 : 0.5;
