@@ -1,0 +1,99 @@
+﻿/*
+//Geoserver WMS切片下载配置
+{
+	"resolutions" :   [128, 64,32],
+	"tileSize" : [256,256],
+	"extent" : [12662882.864568064,2543518.577818389,12761187.939702341,2599303.8005401082],
+	"origin": [0,0],
+	"offsetZoom" :11,
+	"type" : "wms",
+	"url": "http://localhost:8080/geoserver/szgas/wms",	
+	"urlParas" : {
+		"FORMAT" : "image/png",
+		"VERSION" : "1.1.1",
+		"STYLES" : "",
+		"LAYERS" : "szgas:jd_baidu",
+		"REQUEST" : "GetMap",
+		"SRS" : "EPSG:3857",
+		"TRANSPARENT" : true
+	},
+	"runThreadCount" : 5,
+	"savePath" : ""
+}
+*/
+/*
+//Supermap 天地图WMTS瓦片下载配置
+{
+	"resolutions" :   [ 0.703125,  0.3515625, 0.17578125],
+	"tileSize" : [256,256],
+	"extent" : [-180.0 -90.0,180.0,90.0],
+	"origin": [-180,90],
+	"offsetZoom" :1,
+	"type" : "wmts",
+	"url": "http://172.16.12.15:8080/dfc/services/ogc/wmts/vec",
+	"urlParas" : {
+		"SERVICE" : "WMTS",
+		"FORMAT" : "image/png",
+		"VERSION" : "1.0.0",
+		"STYLES" : "default",
+		"LAYER" : "vec",
+		"REQUEST" : "GetTile",
+		"TileMatrixSet" : "CustomCRS4326Scalevec",
+		"TRANSPARENT" : true
+	},
+	"runThreadCount" : 5,
+	"savePath" : ""
+}
+*/
+
+/*
+////天地图WMS下载
+////http://www.scgis.net.cn/iMap/iMapServer/defaultRest/services/sctilemap/WMS?service=wms&request=GetCapabilities&VERSION=1.3.0
+//{
+//  "resolutions": [ 1.40625, 0.703125, 0.3515625 ],
+//  "tileSize": [ 256, 256 ],
+//  "extent": [ -180, -90, 180, 90 ],
+//  "origin": [ -180, -90 ],
+//  "offsetZoom": 1,
+//  "type": "wms",
+//  "url": "http://www.scgis.net.cn/iMap/iMapServer/defaultRest/services/sctilemap/WMS",
+//  "urlParas": {
+//    "FORMAT": "image/png",
+//    "VERSION": "1.1.1",
+//    "STYLES": "",
+//    "LAYERS": "0",
+//    "REQUEST": "GetMap",
+//    "SRS": "EPSG:4326",
+//    "TRANSPARENT": true
+//  },
+//  "runThreadCount": 5,
+//  "savePath": ""
+//}
+  */
+
+/*
+//万州ArcServerRest瓦片下载
+//0.0003433229106872278,
+//0.0001716614553436139,
+//0.00008582953794130404,
+//0.00004291595870115493,
+//0.000021457979350577466,
+//0.000010728989675288733,
+//0.000005363305107141452,
+//0.000002681652553570726,
+//0.000001342016007288278,
+  */
+{
+  "resolutions": [
+    0.0013732916427489112,
+    0.0006866458213744556
+  ],
+  "tileSize": [ 256, 256 ],
+  "extent": [ 107.86896617100007, 30.390792641000075, 108.90726196600006, 31.005204326000076 ],
+  "origin": [ -400.0, 399.9999999999998 ],
+  "offsetZoom": 0,
+  "type": "ArcServerRest",
+  "url": "http://222.180.68.94:6080/arcgis/rest/services/wzpsp/wzmap/MapServer/tile/{0}/{1}/{2}",
+  "runThreadCount": 1,
+  "savePath": ""
+}

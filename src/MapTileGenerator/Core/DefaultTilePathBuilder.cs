@@ -7,10 +7,10 @@ using System.Threading.Tasks;
 
 namespace MapTileGenerator.Core
 {
-    public  class DefaultTilePathBuilder : ITilePathBuilder
+    public class DefaultTilePathBuilder : ITilePathBuilder
     {
-        private string _rootPath;
-        private IDictionary<int, string> _zoomFolds = new Dictionary<int, string>();
+        protected string _rootPath;
+        protected IDictionary<int, string> _zoomFolds = new Dictionary<int, string>();
         public DefaultTilePathBuilder(string rootPath)
         {
             _rootPath = rootPath;
@@ -26,7 +26,7 @@ namespace MapTileGenerator.Core
             }
         }
 
-        public string BuildZoomFold(int zoom , int offsetZoom)
+        public virtual string BuildZoomFold(int zoom, int offsetZoom)
         {
             string fold = Path.Combine(RootPath, (zoom + offsetZoom).ToString());
             if (!Directory.Exists(fold))
@@ -37,24 +37,26 @@ namespace MapTileGenerator.Core
             return fold;
         }
 
-        public string BuildTilePath(TileCoord tileCoord)
+        public virtual string BuildTilePath(TileCoord tileCoord)
         {
-            string x = tileCoord.X.ToString(), 
-                        y=tileCoord.Y.ToString();
+            string x = tileCoord.X.ToString(),
+                        y = tileCoord.Y.ToString();
             if (tileCoord.X < 0)
             {
-                x = "M" + Math.Abs(tileCoord.X).ToString();
+                x = Math.Abs(tileCoord.X).ToString();
             }
             if (tileCoord.Y < 0)
             {
-                y = "M" + Math.Abs(tileCoord.Y).ToString();
+                y = Math.Abs(tileCoord.Y).ToString();
             }
             string zoomFold = _zoomFolds[tileCoord.Zoom];
-            return Path.Combine(zoomFold, x + "_" + y + ".png");             
+            string filePath = Path.Combine(zoomFold, x);
+            if (!Directory.Exists(filePath))
+            {
+                Directory.CreateDirectory(filePath);
+            }
+            return Path.Combine(filePath, y + ".png");
         }
-
-
-
         #endregion
     }
 }

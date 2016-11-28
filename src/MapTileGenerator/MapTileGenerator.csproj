@@ -5,12 +5,13 @@
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
     <ProjectGuid>{86E6D84B-EAE3-440E-B913-2F28A3465949}</ProjectGuid>
-    <OutputType>Exe</OutputType>
+    <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>MapTileGenerator</RootNamespace>
     <AssemblyName>MapTileGenerator</AssemblyName>
     <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
+    <TargetFrameworkProfile />
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <PlatformTarget>AnyCPU</PlatformTarget>
@@ -21,6 +22,7 @@
     <DefineConstants>DEBUG;TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
+    <Prefer32Bit>false</Prefer32Bit>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <PlatformTarget>AnyCPU</PlatformTarget>
@@ -30,6 +32,10 @@
     <DefineConstants>TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
+    <Prefer32Bit>false</Prefer32Bit>
+  </PropertyGroup>
+  <PropertyGroup>
+    <StartupObject />
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="Newtonsoft.Json, Version=9.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
@@ -43,6 +49,11 @@
     <Reference Include="System.Data" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Core\ArcServerRestProvider.cs" />
+    <Compile Include="Core\ArcServerRestTilePathBuilder.cs" />
+    <Compile Include="Core\BaiduMapProvider.cs" />
+    <Compile Include="Core\BaiduTilePathBuilder.cs" />
+    <Compile Include="Core\QueueTaskWorker.cs" />
     <Compile Include="Core\DefaultTilePathBuilder.cs" />
     <Compile Include="Core\Extent.cs" />
     <Compile Include="Core\HttpTileLoadStrategy.cs" />
@@ -54,14 +65,14 @@
     <Compile Include="Core\WmtsTileGrid.cs" />
     <Compile Include="MapConfig.cs" />
     <Compile Include="Core\TileGenerator.cs" />
-    <Compile Include="Core\TileGrid.cs" />
+    <Compile Include="Core\TmsTileGrid.cs" />
     <Compile Include="Core\WmsSourceProvider.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="mapConfig.json">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
     <None Include="packages.config" />
   </ItemGroup>

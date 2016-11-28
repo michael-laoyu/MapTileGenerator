@@ -10,19 +10,19 @@ namespace MapTileGenerator.Core
 {
     public class WmsSourceProvider : ISourceProvider
     {
-        protected TileGrid _tileGrid = null;
+        protected TmsTileGrid _tileGrid = null;
         protected string _url = null;
         protected Dictionary<string, object> _paras = null;
         protected ITileLoadStrategy _tileLoad = new HttpTileLoadStrategy();
 
-        public WmsSourceProvider(TileGrid tileGrid, string url, Dictionary<string,object> paras)
+        public WmsSourceProvider(TmsTileGrid tileGrid, string url, Dictionary<string,object> paras)
         {
             _tileGrid = tileGrid;
             _url = url;
             _paras = paras;
         }
 
-        public TileGrid TileGrid
+        public TmsTileGrid TileGrid
         {
             get
             {
@@ -76,6 +76,11 @@ namespace MapTileGenerator.Core
                     }
                 }
             }
+        }
+
+        public virtual ITilePathBuilder GetTilePathBuilder(string rootPath)
+        {
+            return new DefaultTilePathBuilder(rootPath);
         }
     }
 }

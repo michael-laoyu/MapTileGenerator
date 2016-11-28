@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace MapTileGenerator.Core
 {
-    interface ITilePathBuilder
+    public interface ITilePathBuilder
     {
         string RootPath
         {

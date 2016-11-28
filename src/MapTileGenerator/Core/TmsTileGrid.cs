@@ -6,16 +6,16 @@ using System.Threading.Tasks;
 
 namespace MapTileGenerator.Core
 {
-    public class TileGrid
+    public class TmsTileGrid
     {
         protected double[] _resolutions;
         protected Extent _extent;
         protected Coordinate _origin;
         protected Size _tileSize;
         protected List<Extent> _tileRanges = null;
-        protected double _tileTotal = 0;
+        protected double _totalTile = 0;
 
-        public TileGrid(double[] resolutions, Extent extent, Coordinate origin,Size tileSize)
+        public TmsTileGrid(double[] resolutions, Extent extent, Coordinate origin,Size tileSize)
         {
             this._resolutions = resolutions;
             this._extent = extent;
@@ -32,7 +32,7 @@ namespace MapTileGenerator.Core
                 var leftBottomTileCoord = GetTileCoordByXYAndZoom(i, this._extent.GetLeftBottom(), false);
                 var rightTopTileCoord = GetTileCoordByXYAndZoom(i, this._extent.GetTopRight(), true);
                 result.Add(new Extent(leftBottomTileCoord, rightTopTileCoord));
-                _tileTotal += (rightTopTileCoord.X - leftBottomTileCoord.X +1 ) * (rightTopTileCoord.Y - leftBottomTileCoord.Y +1);
+                _totalTile += (rightTopTileCoord.X - leftBottomTileCoord.X +1 ) * (rightTopTileCoord.Y - leftBottomTileCoord.Y +1);
             }
             return result;
         }
@@ -79,11 +79,11 @@ namespace MapTileGenerator.Core
             }
         }
 
-        public double TileTotal
+        public double TotalTile
         {
             get
             {
-                return _tileTotal;
+                return _totalTile;
             }
         }
 

@@ -132,58 +132,28 @@ namespace MapTileGenerator
 
         public static MapConfig Load()
         {
-            MapConfig instance = null;
+            MapConfig config = null;
             using (FileStream fs = new FileStream(Path.Combine(Environment.CurrentDirectory, "mapConfig.json"),
                         FileMode.Open, FileAccess.Read))
             {
                 StreamReader sr = new StreamReader(fs, Encoding.UTF8);
                 string json = sr.ReadToEnd();
-                instance = JsonConvert.DeserializeObject<MapConfig>(json);  
-            }
-            return instance;
-        }
-
-        public class WmsParas
-        {
-            [JsonProperty("FORMAT")]
-            public string Format
-            {
-                get;
-                set;
+                config = JsonConvert.DeserializeObject<MapConfig>(json);  
             }
 
-            [JsonProperty("VERSION")]
-            public string Version
+            //if (config.TileSize == null)
+            //{
+            //    config.TileSize = new int[] { 256, 256 };
+            //}
+            //if (config.Origin == null)
+            //{
+            //    config.Origin = new double[] { config.Extent[0], config.Extent[3] };
+            //}
+            if (string.IsNullOrEmpty(config.SavePath))
             {
-                get;
-                set;
+                config.SavePath = Path.Combine(Environment.CurrentDirectory, "Tiles");
             }
-
-            [JsonProperty("STYLES")]
-            public string Style
-            {
-                get;
-                set;
-            }
-            [JsonProperty("LAYERS")]
-            public string Layers
-            {
-                get;
-                set;
-            }
-            [JsonProperty("REQUEST")]
-            public string Request
-            {
-                get;
-                set;
-            }
-
-            [JsonProperty("SRS")]
-            public string Srs
-            {
-                get;
-                set;
-            }
+            return config;
         }
     }
 }
