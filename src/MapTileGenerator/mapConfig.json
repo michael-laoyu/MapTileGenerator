@@ -21,6 +21,7 @@
 	"savePath" : ""
 }
 */
+
 /*
 //Supermap 天地图WMTS瓦片下载配置
 {
@@ -47,29 +48,28 @@
 */
 
 /*
-////天地图WMS下载
-////http://www.scgis.net.cn/iMap/iMapServer/defaultRest/services/sctilemap/WMS?service=wms&request=GetCapabilities&VERSION=1.3.0
-//{
-//  "resolutions": [ 1.40625, 0.703125, 0.3515625 ],
-//  "tileSize": [ 256, 256 ],
-//  "extent": [ -180, -90, 180, 90 ],
-//  "origin": [ -180, -90 ],
-//  "offsetZoom": 1,
-//  "type": "wms",
-//  "url": "http://www.scgis.net.cn/iMap/iMapServer/defaultRest/services/sctilemap/WMS",
-//  "urlParas": {
-//    "FORMAT": "image/png",
-//    "VERSION": "1.1.1",
-//    "STYLES": "",
-//    "LAYERS": "0",
-//    "REQUEST": "GetMap",
-//    "SRS": "EPSG:4326",
-//    "TRANSPARENT": true
-//  },
-//  "runThreadCount": 5,
-//  "savePath": ""
-//}
-  */
+//天地图WMS下载
+{
+  "resolutions": [ 1.40625, 0.703125, 0.3515625 ],
+  "tileSize": [ 256, 256 ],
+  "extent": [ -180, -90, 180, 90 ],
+  "origin": [ -180, -90 ],
+  "offsetZoom": 1,
+  "type": "wms",
+  "url": "http://www.scgis.net.cn/iMap/iMapServer/defaultRest/services/sctilemap/WMS",
+  "urlParas": {
+    "FORMAT": "image/png",
+    "VERSION": "1.1.1",
+    "STYLES": "",
+    "LAYERS": "0",
+    "REQUEST": "GetMap",
+    "SRS": "EPSG:4326",
+    "TRANSPARENT": true
+  },
+  "runThreadCount": 5,
+  "savePath": ""
+}
+*/
 
 /*
 //ArcServerRest瓦片下载
@@ -87,14 +87,15 @@
   "url": "http://222.180.68.94:6080/arcgis/rest/services/wzpsp/wzmap/MapServer/tile/{0}/{1}/{2}",
   "runThreadCount": 1,
   "savePath": ""
-} **/
+} 
+*/
 
 //百度地图下载
 {
   //"resolutions": [ 128, 64, 32 ],
   //"resolutions": [ 262144, 131072, 65536, 32768, 16384, 8192, 4096, 2048, 1024, 512, 256, 128, 64, 32, 16, 8, 4, 2, 1 ],//完整的resolutions
   "resolutions": [ 128, 64, 32 ],
-  "offsetZoom": 11,//resolutions如果设置了某一部分级别，必须要设置这个偏移量;
+  "offsetZoom": 11, //resolutions如果设置了某一部分级别，必须要设置这个偏移量;
   "tileSize": [ 256, 256 ],
   "extent": [ 11808770.385317, 3403500.2612752, 11892674.468269, 3442476.25119 ],
   "origin": [ 0, 0 ],
