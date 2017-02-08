@@ -5,6 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Newtonsoft.Json;
+using MapTileGenerator.Core;
 
 namespace MapTileGenerator
 {
@@ -130,6 +131,9 @@ namespace MapTileGenerator
             set;
         }
 
+        [JsonProperty("lastTile")]
+        public TileCoord LastTile;
+
         public static MapConfig Load()
         {
             MapConfig config = null;
@@ -152,8 +156,20 @@ namespace MapTileGenerator
             if (string.IsNullOrEmpty(config.SavePath))
             {
                 config.SavePath = Path.Combine(Environment.CurrentDirectory, "Tiles");
+                Directory.CreateDirectory(config.SavePath);
             }
             return config;
+        }
+
+        public void Save()
+        {
+            using (FileStream fs = new FileStream(Path.Combine(Environment.CurrentDirectory, "mapConfig.json"),
+                        FileMode.OpenOrCreate, FileAccess.Write))
+            {
+                StreamWriter sw = new StreamWriter(fs, Encoding.UTF8);
+                string config = JsonConvert.SerializeObject(this);
+                sw.Write(config);
+            }
         }
     }
 }

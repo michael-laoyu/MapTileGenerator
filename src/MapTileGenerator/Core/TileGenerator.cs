@@ -11,23 +11,53 @@ namespace MapTileGenerator.Core
 {
     public class TileGenerator : IDisposable
     {
-        private int _threadCount = 1;
-        private int _offsetZoom = 0;
         private bool _isStop = false;
         private ITilePathBuilder _tilePathBuilder = null;
         private ISourceProvider _source = null;
-        private QueueTaskWorker<TileCoord> _worker = null;
+        private FailsProvider _failsProvider = new FailsProvider();
+        private QueueTaskWorker<TileCoordWrap> _worker = null;
+        private MapConfig _mapConfig = null;
 
         public EventHandler<TileCoord> TileLoaded;
+        public EventHandler Finished;
 
         public TileGenerator(MapConfig config)
         {
+            _mapConfig = config;
             _source = ProviderFactory.CreateSourceProvider(config);
-            _threadCount = config.RunThreadCount;
-            _offsetZoom = config.OffsetZoom;
             _tilePathBuilder = _source.GetTilePathBuilder(config.SavePath);
-            _worker = new Core.QueueTaskWorker<Core.TileCoord>(config.RunThreadCount, ToDo, true);
+            _worker = new Core.QueueTaskWorker<TileCoordWrap>(config.RunThreadCount, GetTile, true);
+            _totalTile = _source.TileGrid.TotalTile;
+
         }
+
+        private int _successTileIndex = 0;
+        private int _currTileIndex = 0;
+        public int SuccessTileIndex
+        {
+            get
+            {
+                return _successTileIndex;
+            }
+        }
+
+        private double _totalTile;
+        public double TotalTile
+        {
+            get
+            {
+                return _totalTile;
+            }
+        }
+
+        public int FailTiles
+        {
+            get
+            {
+                return _failsProvider.Count;
+            }
+        }
+
 
         public ISourceProvider Source
         {
@@ -37,60 +67,51 @@ namespace MapTileGenerator.Core
             }
         }
 
-        protected virtual void OnTileLoaded(TileCoord tileCoord)
-        {
-            if (this.TileLoaded != null)
-            {
-                TileLoaded(this, tileCoord);
-            }
-        }
-
         public void Start()
         {
-            if(_worker !=null)
+            if (_worker != null)
             {
                 _worker.Start();
             }
-            _source.EnumerateTileRange(
+            TryDoFails();
+            _source.EnumerateTileRange(_mapConfig.LastTile,
                 (zoom) =>
                 {
-                    _tilePathBuilder.BuildZoomFold(zoom, _offsetZoom);
+                    _tilePathBuilder.BuildZoomFold( zoom, _mapConfig.OffsetZoom);
                 },
                (tile) =>
                {
-                   _worker.TryQueue(tile);
+                   _worker.TryQueue(new TileCoordWrap
+                   {
+                       Tile = tile,
+                       OnSuccess = null,
+                       OnFailed = (tile1,ex) =>
+                       {
+                           _failsProvider.Insert(tile1);
+                           Console.WriteLine(ex.Message);
+                       },
+                       OnFinally = (tile2) =>
+                       {
+                           _mapConfig.LastTile = tile2;
+                           if (_currTileIndex == TotalTile)
+                           {
+                               _mapConfig.Save();
+                               OnFinished();
+                           }
+                       }
+                   });
                });
         }
 
-        private void ToDo(TileCoord tileCoord)
+        public void RetryFails()
         {
-            try
-            {
-                using (Stream stream = _source.GetTile(tileCoord))
-                {
-                    string filePath = _tilePathBuilder.BuildTilePath(tileCoord);
-                    using (FileStream fs = new FileStream(filePath, FileMode.OpenOrCreate, FileAccess.ReadWrite))
-                    {
-                        int ret = 0;
-                        byte[] buffer = new byte[8192];//8K
-                        ret = stream.Read(buffer, 0, buffer.Length);
-                        while (ret > 0)
-                        {
-                            fs.Write(buffer, 0, ret);
-                            ret = stream.Read(buffer, 0, buffer.Length);
-                        }
-                        OnTileLoaded(tileCoord);
-                    }
-                }
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine(ex.Message);
-            }
+            _currTileIndex = 0;
+            TryDoFails();
         }
 
         public void Close()
         {
+            _mapConfig.Save();
             if (_worker != null)
             {
                 _worker.Close();
@@ -106,6 +127,90 @@ namespace MapTileGenerator.Core
 
         #endregion
 
-       
+        protected virtual void OnTileLoaded(TileCoord tileCoord)
+        {
+            Interlocked.Increment(ref _successTileIndex);
+            if (this.TileLoaded != null)
+            {
+                TileLoaded(this, tileCoord);
+            }
+        }
+
+        protected virtual void OnFinished()
+        {
+            this.Finished?.Invoke(this, EventArgs.Empty);
+        }
+
+        private void GetTile(TileCoordWrap tileWrap)
+        {
+            try
+            {
+                Interlocked.Increment(ref _currTileIndex);
+                using (Stream stream = _source.GetTile(tileWrap.Tile))
+                {
+                    string filePath = _tilePathBuilder.BuildTilePath(tileWrap.Tile);
+                    using (FileStream fs = new FileStream(filePath, FileMode.OpenOrCreate, FileAccess.ReadWrite))
+                    {
+                        byte[] buffer = new byte[8192];//8K
+                        int ret = stream.Read(buffer, 0, buffer.Length);
+                        while (ret > 0)
+                        {
+                            fs.Write(buffer, 0, ret);
+                            ret = stream.Read(buffer, 0, buffer.Length);
+                        }
+                        tileWrap.OnSuccess?.Invoke();
+                        OnTileLoaded(tileWrap.Tile);
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                tileWrap.OnFailed.Invoke(tileWrap.Tile, ex);
+            }
+            finally
+            {
+                tileWrap.OnFinally.Invoke(tileWrap.Tile);
+            }
+        }
+
+        private void TryDoFails()
+        {
+            string failsDb = Path.Combine(_mapConfig.SavePath, FailsProvider.FILENAME);
+            var failTiles = _failsProvider.Load(failsDb);
+            if (failTiles != null)
+            {
+                foreach (FailTile failTile in failTiles)
+                {
+                    _tilePathBuilder.BuildZoomFold(failTile.Zoom, _mapConfig.OffsetZoom);
+                    _worker.TryQueue(new TileCoordWrap
+                    {
+                        Tile = failTile.ConvertTo(),
+                        OnSuccess = () =>
+                        {
+                            _failsProvider.Delete(failTile);
+                        },
+                        OnFailed = (tile,ex) =>
+                        {
+                            Console.WriteLine(ex.Message);
+                        },
+                        OnFinally = (tile) =>
+                        {
+                            if (_currTileIndex == FailTiles)
+                            {
+                                OnFinished();
+                            }
+                        }
+                    });
+                }
+            }
+        }
+    }
+
+    public class TileCoordWrap
+    {
+        public TileCoord Tile;
+        public Action OnSuccess = null;
+        public Action<TileCoord,Exception> OnFailed = null;
+        public Action<TileCoord> OnFinally = null;
     }
 }

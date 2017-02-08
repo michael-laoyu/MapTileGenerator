@@ -16,6 +16,7 @@ namespace MapTileGenerator.Core
         public Stream GetTile(string url)
         {
             HttpWebRequest request = WebRequest.Create(url) as HttpWebRequest;
+            request.Timeout = 3000;
             WebResponse response = request.GetResponse();
             return response.GetResponseStream();
         }

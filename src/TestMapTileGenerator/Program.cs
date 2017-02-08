@@ -16,20 +16,31 @@ namespace TestMapTileGenerator
             Console.WriteLine("加载mapConfig.json...");
             MapConfig mapConfig = MapConfig.Load();
             TileGenerator generator = new TileGenerator(mapConfig);
-            var successTileIndex = 0;
             generator.TileLoaded += new EventHandler<TileCoord>((sender, tileCoord) =>
             {
-                Interlocked.Increment(ref successTileIndex);
                 Console.WriteLine(string.Format("Tile : zoom ：  {0} x： {1} y ：{2}，已完成：{3}/{4}", tileCoord.Zoom, tileCoord.X,
-                    tileCoord.Y, successTileIndex, generator.Source.TileGrid.TotalTile));
+                    tileCoord.Y, generator.SuccessTileIndex, generator.TotalTile));
             });
+            generator.Finished += new EventHandler((sender, e) =>
+             {
+                 Console.WriteLine(string.Format("完成：{0}/{1}，失败：{2}!", generator.SuccessTileIndex, generator.TotalTile,generator.FailTiles));
+
+                 //if (generator.FailTiles > 0)
+                 //{
+                 //    Console.WriteLine("是否尝试重新下载失败的瓦片？[Y/N]");
+                 //    string askYesNo = Console.ReadLine();
+                 //    if (askYesNo.Trim().ToUpper() =="Y")
+                 //    {
+                 //        generator.RetryFails();
+                 //    }
+                 //}
+             });
+
             Console.WriteLine("服务已启动......");
-            Console.WriteLine("输入回车退出...");
-
             generator.Start();
-            Console.ReadLine();
+            Console.WriteLine("输入回车退出...");
+            Console.ReadKey();
             generator.Close();
-
         }
     }
 }

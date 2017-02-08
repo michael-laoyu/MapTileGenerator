@@ -27,10 +27,8 @@ namespace MapTileGenerator.Core
             Init();
         }
 
-        int index;
         public void TryQueue(T item)
         {
-            Console.WriteLine(++index);
             _queue.Add(item);
         }
 

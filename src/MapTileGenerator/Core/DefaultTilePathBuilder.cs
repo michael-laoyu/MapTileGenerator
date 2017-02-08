@@ -33,7 +33,10 @@ namespace MapTileGenerator.Core
             {
                 Directory.CreateDirectory(fold);
             }
-            _zoomFolds.Add(zoom, fold);
+            if (!_zoomFolds.ContainsKey(zoom))
+            {
+                _zoomFolds.Add(zoom, fold);
+            }
             return fold;
         }
 

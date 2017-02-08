@@ -61,10 +61,15 @@ namespace MapTileGenerator.Core
             return url;
         }
 
-        public virtual void EnumerateTileRange(Action<int> getZoomCallback, Action<TileCoord> getTileCallback)
+        public virtual void EnumerateTileRange(TileCoord lastTile, Action<int> getZoomCallback, Action<TileCoord> getTileCallback)
         {
+            int minZoom = 0;
+            if (lastTile != null)
+            {
+                minZoom = lastTile.Zoom;
+            }
             List<Extent> fullTileRange = _tileGrid.TileRanges;
-            for (int z = 0; z < fullTileRange.Count; z++)
+            for (int z = minZoom; z < fullTileRange.Count; z++)
             {
                 getZoomCallback(z);
                 for (double x = fullTileRange[z].MinX; x <= fullTileRange[z].MaxX; ++x)
