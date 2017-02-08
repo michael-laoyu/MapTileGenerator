@@ -22,7 +22,7 @@ namespace MapTileGenerator.Core
 
         public TileGenerator(MapConfig config)
         {
-            _source = SourceProviderFactory.CreateSourceProvider(config);
+            _source = ProviderFactory.CreateSourceProvider(config);
             _threadCount = config.RunThreadCount;
             _offsetZoom = config.OffsetZoom;
             _tilePathBuilder = _source.GetTilePathBuilder(config.SavePath);

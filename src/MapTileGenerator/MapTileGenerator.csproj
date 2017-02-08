@@ -60,7 +60,7 @@
     <Compile Include="Core\ISourceProvider.cs" />
     <Compile Include="Core\ITileLoadStrategy.cs" />
     <Compile Include="Core\ITilePathBuilder.cs" />
-    <Compile Include="Core\SourceProviderFactory.cs" />
+    <Compile Include="ProviderFactory.cs" />
     <Compile Include="Core\WmtsSourceProvider.cs" />
     <Compile Include="Core\WmtsTileGrid.cs" />
     <Compile Include="MapConfig.cs" />

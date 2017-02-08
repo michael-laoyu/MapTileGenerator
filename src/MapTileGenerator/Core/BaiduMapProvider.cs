@@ -8,8 +8,10 @@ namespace MapTileGenerator.Core
 {
     public class BaiduMapProvider : WmsSourceProvider
     {
-        public BaiduMapProvider(TmsTileGrid tileGrid, string url, Dictionary<string, object> paras) : base(tileGrid, url, paras)
+        private int offsetZoom;
+        public BaiduMapProvider(TmsTileGrid tileGrid, string url, Dictionary<string, object> paras,int offsetZoom) : base(tileGrid, url, paras)
         {
+            this.offsetZoom = offsetZoom;
         }
 
         protected override string GetRequestUrl(TileCoord tileCoord)
@@ -25,7 +27,10 @@ namespace MapTileGenerator.Core
             {
                 y = "M" + Math.Abs(tileCoord.Y);
             }
-            url = string.Format(url, tileCoord.Zoom, Math.Abs(tileCoord.Y), Math.Abs(tileCoord.X));
+            url += "&x=" + tileCoord.X.ToString();
+            url += "&y=" + tileCoord.Y.ToString();
+            url += "&z=" + (offsetZoom + tileCoord.Zoom).ToString();
+            //url = string.Format(url, tileCoord.Zoom, Math.Abs(tileCoord.Y), Math.Abs(tileCoord.X));
             return url;
         }
 
