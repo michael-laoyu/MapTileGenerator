@@ -4,8 +4,7 @@
 ##使用说明：
 设置mapConfig.json，根据配置项请求瓦片，支持多线程方式。
 
-### geoserver wms瓦片下载配置
-  
+### geoserver wms瓦片下载配置  
     {        
         "resolutions" :   [128, 64,32],  
         "tileSize" : [256,256],  
@@ -111,6 +110,7 @@
 
 
 ##瓦片规则
+
 瓦片存储路径：程序目录\Tiles\Zoom+offsetZoom\x\y.png
 ![Paste_Image.png](http://upload-images.jianshu.io/upload_images/2137628-204d853cce816a7d.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240)
 
