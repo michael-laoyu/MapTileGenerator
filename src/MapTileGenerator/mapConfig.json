@@ -5,7 +5,7 @@
 	"tileSize" : [256,256],
 	"extent" : [12662882.864568064,2543518.577818389,12761187.939702341,2599303.8005401082],
 	"origin": [0,0],
-	"offsetZoom" :11,
+	"offsetZoom" :11,//resolutions如果设置了某一部分级别，必须要设置这个偏移量;
 	"type" : "wms",
 	"url": "http://localhost:8080/geoserver/szgas/wms",	
 	"urlParas" : {
@@ -29,7 +29,7 @@
 	"tileSize" : [256,256],
 	"extent" : [-180.0 -90.0,180.0,90.0],
 	"origin": [-180,90],
-	"offsetZoom" :1,
+	"offsetZoom" :1,//resolutions如果设置了某一部分级别，必须要设置这个偏移量;
 	"type" : "wmts",
 	"url": "http://172.16.12.15:8080/dfc/services/ogc/wmts/vec",
 	"urlParas" : {
@@ -54,7 +54,7 @@
   "tileSize": [ 256, 256 ],
   "extent": [ -180, -90, 180, 90 ],
   "origin": [ -180, -90 ],
-  "offsetZoom": 1,
+  "offsetZoom": 1,//resolutions如果设置了某一部分级别，必须要设置这个偏移量;
   "type": "wms",
   "url": "http://www.scgis.net.cn/iMap/iMapServer/defaultRest/services/sctilemap/WMS",
   "urlParas": {
@@ -82,7 +82,7 @@
   "tileSize": [ 256, 256 ],
   "extent": [ 107.86896617100007, 30.390792641000075, 108.90726196600006, 31.005204326000076 ],
   "origin": [ -400.0, 399.9999999999998 ],
-  "offsetZoom": 0,
+  "offsetZoom": 0,//resolutions如果设置了某一部分级别，必须要设置这个偏移量;
   "type": "ArcServerRest",
   "url": "http://222.180.68.94:6080/arcgis/rest/services/wzpsp/wzmap/MapServer/tile/{0}/{1}/{2}",
   "runThreadCount": 1,
