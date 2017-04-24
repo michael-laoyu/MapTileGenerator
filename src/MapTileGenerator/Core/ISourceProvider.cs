@@ -4,10 +4,10 @@ namespace MapTileGenerator.Core
 {
     public interface ISourceProvider
     {
-       Stream GetTile(TileCoord tileCoord);
-       void EnumerateTileRange(TileCoord lastTile, Action<int> getZoomCallback, Action<TileCoord> getTileCallback);
+        string GetRequestUrl(TileCoord tileCoord);
+       void EnumerateTileRange(TileCoord lastTile, Action<TileCoord> getTileCallback);
         ITileGrid TileGrid { get; }
 
-        ITilePathBuilder GetTilePathBuilder(string rootPath);
+        OutputTile GetOutputTile(TileCoord input, int zoomOffset);
     }
 }

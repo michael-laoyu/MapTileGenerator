@@ -16,20 +16,13 @@ namespace MapTileGenerator.Core
             this.offsetZoom = offsetZoom;
         }
 
-        protected override string GetRequestUrl(TileCoord tileCoord)
+        public override string GetRequestUrl(TileCoord tileCoord)
         {
             string url = this._url;
             url = url.Replace("{z}", (offsetZoom + tileCoord.Zoom).ToString());
             url = url.Replace("{y}", tileCoord.Y.ToString());
             url = url.Replace("{x}", tileCoord.X.ToString());
             return url;
-        }
-
-        public override ITilePathBuilder GetTilePathBuilder(string rootPath)
-        {
-            return new ArcServerRestTilePathBuilder(rootPath);
-        }
-
-        
+        }     
     }
 }

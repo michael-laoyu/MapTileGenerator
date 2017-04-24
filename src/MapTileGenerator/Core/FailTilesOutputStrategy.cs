@@ -9,13 +9,13 @@ using System.Threading.Tasks;
 
 namespace MapTileGenerator.Core
 {
-    public class FailsProvider
+    public class FailTilesOutputStrategy
     {
         private string _sqliteConnectionString;
         public const string FILENAME = "fails.db";
         public int Count = 0;
 
-        public List<FailTile> Load(string file)
+        public List<FailTileDto> Load(string file)
         {
             try
             {
@@ -25,10 +25,10 @@ namespace MapTileGenerator.Core
                 if (File.Exists(file))
                 {
                     var sql = @"select ID,Zoom,X,Y from FailTile;";
-                    var list = new List<FailTile>();
+                    var list = new List<FailTileDto>();
                     using (var conn = new SQLiteConnection(_sqliteConnectionString))
                     {
-                        list = conn.Query<FailTile>(sql) as List<FailTile>;
+                        list = conn.Query<FailTileDto>(sql) as List<FailTileDto>;
                         Count = list.Count;
                         return list;
                     }
@@ -83,7 +83,7 @@ namespace MapTileGenerator.Core
             }
         }
 
-        public void Delete(FailTile failTile)
+        public void Delete(FailTileDto failTile)
         {
             try
             {
@@ -108,11 +108,11 @@ namespace MapTileGenerator.Core
         }
     }
 
-    public class FailTile
+    public class FailTileDto
     {
-        public FailTile() { }
+        public FailTileDto() { }
 
-        public FailTile(int id, int zoom, double x, double y)
+        public FailTileDto(int id, int zoom, double x, double y)
         {
             Zoom = zoom;
             X = x;

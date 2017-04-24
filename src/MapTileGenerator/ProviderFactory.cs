@@ -18,7 +18,8 @@ namespace MapTileGenerator
             string url = config.Url;
             var paras = config.UrlParas;
             ISourceProvider source = null;
-            ITileGrid tileGrid = null;
+            ITileGrid tileGrid = null;          
+
             switch (config.Type.ToLower())
             {
                 case "baidu":
@@ -39,6 +40,24 @@ namespace MapTileGenerator
                     break;
             }
             return source;
+        }
+
+        public static ITileOutputStrategy CreateOutputStrategy(MapConfig config)
+        {
+            ITileOutputStrategy result = null;
+           switch (config.Output.ToLower())
+            {
+                case "file":
+                    result = new DefaultOutputStrategy(config.SavePath);
+                    break;
+                case "sqlite":
+                    result = new SqliteOutputStrategy(config.SavePath);
+                    break;
+                default:
+                    result = new DefaultOutputStrategy(config.SavePath);
+                    break;
+            }
+            return result;
         }
     }
 }

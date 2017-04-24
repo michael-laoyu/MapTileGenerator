@@ -13,7 +13,6 @@ namespace MapTileGenerator.Core
         protected ITileGrid _tileGrid = null;
         protected string _url = null;
         protected Dictionary<string, object> _paras = null;
-        protected ITileLoadStrategy _tileLoad = new HttpTileLoadStrategy();
 
         public WmsSourceProvider(ITileGrid tileGrid, string url, Dictionary<string,object> paras)
         {
@@ -30,13 +29,7 @@ namespace MapTileGenerator.Core
             }
         }
 
-        public virtual Stream GetTile(TileCoord tileCoord)
-        {
-            string url = GetRequestUrl(tileCoord);
-            return _tileLoad.GetTile(url);
-        }
-
-        protected virtual string GetRequestUrl(TileCoord tileCoord)
+        public virtual string GetRequestUrl(TileCoord tileCoord)
         {
             Extent tileExtent = _tileGrid.GetTileExtent(tileCoord);
             string url = this._url;
@@ -62,7 +55,6 @@ namespace MapTileGenerator.Core
         }
 
         public virtual void EnumerateTileRange(TileCoord lastTile/*为了实现续载功能，从上次失败的点开始继续*/,
-                                    Action<int> getZoomCallback, 
                                     Action<TileCoord> getTileCallback)
         {
             int minZoom = 0;
@@ -73,7 +65,6 @@ namespace MapTileGenerator.Core
             List<Extent> fullTileRange = _tileGrid.TileRanges;
             for (int z = minZoom; z < fullTileRange.Count; z++)
             {
-                getZoomCallback(z);
                 for (double x = fullTileRange[z].MinX; x <= fullTileRange[z].MaxX; ++x)
                 {
                     for (double y = fullTileRange[z].MinY; y <= fullTileRange[z].MaxY; ++y)
@@ -85,9 +76,19 @@ namespace MapTileGenerator.Core
             }
         }
 
-        public virtual ITilePathBuilder GetTilePathBuilder(string rootPath)
+        public virtual OutputTile GetOutputTile(TileCoord input, int zoomOffset)
         {
-            return new DefaultTilePathBuilder(rootPath);
+            double x = input.X,
+                        y = input.Y;
+            if (input.X < 0)
+            {
+                x = Math.Abs(input.X);
+            }
+            if (input.Y < 0)
+            {
+                y = Math.Abs(input.Y);
+            }
+            return new OutputTile((input.Zoom + zoomOffset).ToString(), x.ToString(), y.ToString());
         }
     }
 }

@@ -14,7 +14,7 @@ namespace MapTileGenerator.Core
 
         }
 
-        protected override string GetRequestUrl(TileCoord tileCoord)
+        public override string GetRequestUrl(TileCoord tileCoord)
         {
             string url = this._url;
             if (!url.EndsWith("?"))

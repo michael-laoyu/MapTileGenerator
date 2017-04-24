@@ -14,7 +14,7 @@ namespace MapTileGenerator.Core
             this.offsetZoom = offsetZoom;
         }
 
-        protected override string GetRequestUrl(TileCoord tileCoord)
+        public override string GetRequestUrl(TileCoord tileCoord)
         {
             string url = this._url;
             string x = tileCoord.X.ToString();
@@ -37,9 +37,19 @@ namespace MapTileGenerator.Core
             return url;
         }
 
-        public override ITilePathBuilder GetTilePathBuilder(string rootPath)
+        public override OutputTile GetOutputTile(TileCoord input, int zoomOffset)
         {
-            return new BaiduTilePathBuilder(rootPath);
+            string x = input.X.ToString(),
+                       y = input.Y.ToString();
+            if (input.X < 0)
+            {
+                x = "M" + Math.Abs(input.X).ToString();
+            }
+            if (input.Y < 0)
+            {
+                y = "M" + Math.Abs(input.Y).ToString();
+            }
+            return new OutputTile((input.Zoom + zoomOffset).ToString(), x.ToString(), y.ToString());
         }
     }
 }

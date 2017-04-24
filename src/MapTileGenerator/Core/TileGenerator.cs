@@ -11,9 +11,10 @@ namespace MapTileGenerator.Core
 {
     public class TileGenerator : IDisposable
     {
-        private ITilePathBuilder _tilePathBuilder = null;
+        private ITileOutputStrategy _outputStrategy = null;
+        private ITileLoadStrategy _tileLoadStrategy = new HttpTileLoadStrategy();
         private ISourceProvider _source = null;
-        private FailsProvider _failsProvider = new FailsProvider();
+        private FailTilesOutputStrategy _failsStrategy = new FailTilesOutputStrategy();
         private QueueTaskWorker<TileCoordWrap> _worker = null;
         private MapConfig _mapConfig = null;
 
@@ -24,10 +25,9 @@ namespace MapTileGenerator.Core
         {
             _mapConfig = config;
             _source = ProviderFactory.CreateSourceProvider(config);
-            _tilePathBuilder = _source.GetTilePathBuilder(config.SavePath);
+            _outputStrategy = ProviderFactory.CreateOutputStrategy(config);
             _worker = new Core.QueueTaskWorker<TileCoordWrap>(config.RunThreadCount, GetTile, true);
             _totalTile = _source.TileGrid.TotalTile;
-
         }
 
         private int _successTileIndex = 0;
@@ -53,12 +53,12 @@ namespace MapTileGenerator.Core
         {
             get
             {
-                return _failsProvider.Count;
+                return _failsStrategy.Count;
             }
         }
 
 
-        public ISourceProvider Source
+        public ISourceProvider MapSource
         {
             get
             {
@@ -73,11 +73,7 @@ namespace MapTileGenerator.Core
                 _worker.Start();
             }
             TryDoFails();
-            _source.EnumerateTileRange(_mapConfig.LastTile,
-                (zoom) =>
-                {
-                    _tilePathBuilder.BuildZoomFold( zoom, _mapConfig.OffsetZoom);
-                },
+            _source.EnumerateTileRange(_mapConfig.LastTile,               
                (tile) =>
                {
                    _worker.TryQueue(new TileCoordWrap
@@ -86,7 +82,7 @@ namespace MapTileGenerator.Core
                        OnSuccess = null,
                        OnFailed = (tile1,ex) =>
                        {
-                           _failsProvider.Insert(tile1);
+                           _failsStrategy.Insert(tile1);
                            Console.WriteLine(ex.Message);
                        },
                        OnFinally = (tile2) =>
@@ -145,21 +141,12 @@ namespace MapTileGenerator.Core
             try
             {
                 Interlocked.Increment(ref _currTileIndex);
-                using (Stream stream = _source.GetTile(tileWrap.Tile))
+                string url = _source.GetRequestUrl(tileWrap.Tile);
+                using (Stream stream = _tileLoadStrategy.GetTile(url))
                 {
-                    string filePath = _tilePathBuilder.BuildTilePath(tileWrap.Tile);
-                    using (FileStream fs = new FileStream(filePath, FileMode.OpenOrCreate, FileAccess.ReadWrite))
-                    {
-                        byte[] buffer = new byte[8192];//8K
-                        int ret = stream.Read(buffer, 0, buffer.Length);
-                        while (ret > 0)
-                        {
-                            fs.Write(buffer, 0, ret);
-                            ret = stream.Read(buffer, 0, buffer.Length);
-                        }
-                        tileWrap.OnSuccess?.Invoke();
-                        OnTileLoaded(tileWrap.Tile);
-                    }
+                    _outputStrategy.Write(stream, _source.GetOutputTile(tileWrap.Tile, _mapConfig.OffsetZoom));
+                    tileWrap.OnSuccess?.Invoke();
+                    OnTileLoaded(tileWrap.Tile);
                 }
             }
             catch (Exception ex)
@@ -174,19 +161,18 @@ namespace MapTileGenerator.Core
 
         private void TryDoFails()
         {
-            string failsDb = Path.Combine(_mapConfig.SavePath, FailsProvider.FILENAME);
-            var failTiles = _failsProvider.Load(failsDb);
+            string failsDb = Path.Combine(_mapConfig.SavePath, FailTilesOutputStrategy.FILENAME);
+            var failTiles = _failsStrategy.Load(failsDb);
             if (failTiles != null)
             {
-                foreach (FailTile failTile in failTiles)
+                foreach (FailTileDto failTile in failTiles)
                 {
-                    _tilePathBuilder.BuildZoomFold(failTile.Zoom, _mapConfig.OffsetZoom);
                     _worker.TryQueue(new TileCoordWrap
                     {
                         Tile = failTile.ConvertTo(),
                         OnSuccess = () =>
                         {
-                            _failsProvider.Delete(failTile);
+                            _failsStrategy.Delete(failTile);
                         },
                         OnFailed = (tile,ex) =>
                         {

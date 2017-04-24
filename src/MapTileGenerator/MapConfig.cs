@@ -117,6 +117,13 @@ namespace MapTileGenerator
             set;
         }
 
+        [JsonProperty("output")]
+        public string Output
+        {
+            get;
+            set;
+        }
+
         [JsonProperty("url")]
         public string Url
         {
@@ -157,6 +164,10 @@ namespace MapTileGenerator
             {
                 config.SavePath = Path.Combine(Environment.CurrentDirectory, "Tiles");
                 Directory.CreateDirectory(config.SavePath);
+            }
+            if (string.IsNullOrEmpty(config.Output))
+            {
+                config.Output = "File";
             }
             return config;
         }

@@ -64,18 +64,17 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Core\ArcServerRestProvider.cs" />
-    <Compile Include="Core\ArcServerRestTilePathBuilder.cs" />
     <Compile Include="Core\BaiduMapProvider.cs" />
-    <Compile Include="Core\BaiduTilePathBuilder.cs" />
-    <Compile Include="Core\FailsProvider.cs" />
+    <Compile Include="Core\FailTilesOutputStrategy.cs" />
     <Compile Include="Core\ITileGrid.cs" />
     <Compile Include="Core\QueueTaskWorker.cs" />
-    <Compile Include="Core\DefaultTilePathBuilder.cs" />
+    <Compile Include="Core\DefaultOutputStrategy.cs" />
     <Compile Include="Core\Extent.cs" />
     <Compile Include="Core\HttpTileLoadStrategy.cs" />
     <Compile Include="Core\ISourceProvider.cs" />
     <Compile Include="Core\ITileLoadStrategy.cs" />
-    <Compile Include="Core\ITilePathBuilder.cs" />
+    <Compile Include="Core\ITileOutputStrategy.cs" />
+    <Compile Include="Core\SqliteOutputStrategy.cs" />
     <Compile Include="ProviderFactory.cs" />
     <Compile Include="Core\WmtsSourceProvider.cs" />
     <Compile Include="Core\WmtsTileGrid.cs" />
