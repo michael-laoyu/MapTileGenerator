@@ -8,16 +8,20 @@ namespace MapTileGenerator.Core
 {
     public class ArcServerRestProvider : WmsSourceProvider
     {
-        public ArcServerRestProvider(TmsTileGrid tileGrid, string url, Dictionary<string, object> paras) : 
+        private int offsetZoom;
+
+        public ArcServerRestProvider(ITileGrid tileGrid, string url, Dictionary<string, object> paras,int offsetZoom) : 
                 base(tileGrid, url, paras)
         {
-
+            this.offsetZoom = offsetZoom;
         }
 
         protected override string GetRequestUrl(TileCoord tileCoord)
         {
             string url = this._url;
-            url = string.Format(url, tileCoord.Zoom, Math.Abs(tileCoord.Y), Math.Abs(tileCoord.X));
+            url = url.Replace("{z}", (offsetZoom + tileCoord.Zoom).ToString());
+            url = url.Replace("{y}", tileCoord.Y.ToString());
+            url = url.Replace("{x}", tileCoord.X.ToString());
             return url;
         }
 

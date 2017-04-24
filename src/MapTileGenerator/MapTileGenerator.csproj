@@ -58,6 +58,7 @@
       <HintPath>..\packages\System.Data.SQLite.Core.1.0.104.0\lib\net45\System.Data.SQLite.dll</HintPath>
       <Private>True</Private>
     </Reference>
+    <Reference Include="System.Net.Http" />
     <Reference Include="System.Xml" />
     <Reference Include="System.Xml.Linq" />
   </ItemGroup>
@@ -67,6 +68,7 @@
     <Compile Include="Core\BaiduMapProvider.cs" />
     <Compile Include="Core\BaiduTilePathBuilder.cs" />
     <Compile Include="Core\FailsProvider.cs" />
+    <Compile Include="Core\ITileGrid.cs" />
     <Compile Include="Core\QueueTaskWorker.cs" />
     <Compile Include="Core\DefaultTilePathBuilder.cs" />
     <Compile Include="Core\Extent.cs" />

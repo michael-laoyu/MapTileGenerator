@@ -8,7 +8,7 @@ namespace MapTileGenerator.Core
 {
     public class WmtsSourceProvider : WmsSourceProvider
     {
-        public WmtsSourceProvider(TmsTileGrid tileGrid, string url, Dictionary<string, object> paras)
+        public WmtsSourceProvider(ITileGrid tileGrid, string url, Dictionary<string, object> paras)
             :base(tileGrid,url,paras)
         {
 

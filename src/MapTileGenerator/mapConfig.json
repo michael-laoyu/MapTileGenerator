@@ -84,7 +84,7 @@
   "origin": [ -400.0, 399.9999999999998 ],
   "offsetZoom": 0,//resolutions如果设置了某一部分级别，必须要设置这个偏移量;
   "type": "ArcServerRest",
-  "url": "http://222.180.68.94:6080/arcgis/rest/services/wzpsp/wzmap/MapServer/tile/{0}/{1}/{2}",
+  "url": "http://222.180.68.94:6080/arcgis/rest/services/wzpsp/wzmap/MapServer/tile/{z}/{y}/{x}",
   "runThreadCount": 1,
   "savePath": ""
 } 
@@ -100,6 +100,6 @@
   "extent": [ 11808770.385317, 3403500.2612752, 11892674.468269, 3442476.25119 ],
   "origin": [ 0, 0 ],
   "type": "baidu",
-  "url": "http://online3.map.bdimg.com/onlinelabel/?qt=tile&styles=pl&udt=20151021&scaler=1&p=1&qt=tile",
+  "url": "http://online3.map.bdimg.com/onlinelabel/?qt=tile&styles=pl&udt=20151021&scaler=1&p=1&qt=tile&x={x}&y={y}&z={z}",
   "runThreadCount":5
 }

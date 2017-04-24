@@ -6,7 +6,7 @@ namespace MapTileGenerator.Core
     {
        Stream GetTile(TileCoord tileCoord);
        void EnumerateTileRange(TileCoord lastTile, Action<int> getZoomCallback, Action<TileCoord> getTileCallback);
-        TmsTileGrid TileGrid { get; }
+        ITileGrid TileGrid { get; }
 
         ITilePathBuilder GetTilePathBuilder(string rootPath);
     }

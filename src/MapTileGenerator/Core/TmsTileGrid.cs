@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace MapTileGenerator.Core
 {
-    public class TmsTileGrid
+    public class TmsTileGrid : ITileGrid
     {
         protected double[] _resolutions;
         protected Extent _extent;

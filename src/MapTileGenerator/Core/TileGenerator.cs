@@ -11,7 +11,6 @@ namespace MapTileGenerator.Core
 {
     public class TileGenerator : IDisposable
     {
-        private bool _isStop = false;
         private ITilePathBuilder _tilePathBuilder = null;
         private ISourceProvider _source = null;
         private FailsProvider _failsProvider = new FailsProvider();

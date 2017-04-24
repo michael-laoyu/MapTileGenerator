@@ -10,19 +10,19 @@ namespace MapTileGenerator.Core
 {
     public class WmsSourceProvider : ISourceProvider
     {
-        protected TmsTileGrid _tileGrid = null;
+        protected ITileGrid _tileGrid = null;
         protected string _url = null;
         protected Dictionary<string, object> _paras = null;
         protected ITileLoadStrategy _tileLoad = new HttpTileLoadStrategy();
 
-        public WmsSourceProvider(TmsTileGrid tileGrid, string url, Dictionary<string,object> paras)
+        public WmsSourceProvider(ITileGrid tileGrid, string url, Dictionary<string,object> paras)
         {
             _tileGrid = tileGrid;
             _url = url;
             _paras = paras;
         }
 
-        public TmsTileGrid TileGrid
+        public ITileGrid TileGrid
         {
             get
             {
@@ -61,12 +61,14 @@ namespace MapTileGenerator.Core
             return url;
         }
 
-        public virtual void EnumerateTileRange(TileCoord lastTile, Action<int> getZoomCallback, Action<TileCoord> getTileCallback)
+        public virtual void EnumerateTileRange(TileCoord lastTile/*为了实现续载功能，从上次失败的点开始继续*/,
+                                    Action<int> getZoomCallback, 
+                                    Action<TileCoord> getTileCallback)
         {
             int minZoom = 0;
             if (lastTile != null)
             {
-                minZoom = lastTile.Zoom;
+                minZoom = lastTile.Zoom;//从失败的那一级别开始下载。
             }
             List<Extent> fullTileRange = _tileGrid.TileRanges;
             for (int z = minZoom; z < fullTileRange.Count; z++)

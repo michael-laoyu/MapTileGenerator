@@ -18,23 +18,24 @@ namespace MapTileGenerator
             string url = config.Url;
             var paras = config.UrlParas;
             ISourceProvider source = null;
-            switch (config.Type.ToUpper())
+            ITileGrid tileGrid = null;
+            switch (config.Type.ToLower())
             {
-                case "BAIDU":
-                    var tileGrid = new TmsTileGrid(config.Resolutions, extent, origin, tileSize);
+                case "baidu":
+                    tileGrid = new TmsTileGrid(config.Resolutions, extent, origin, tileSize);
                     source = new BaiduMapProvider(tileGrid, config.Url, paras,config.OffsetZoom);
                     break;
-                case "WMTS" :
-                    var wmtsTileGrid = new WmtsTileGrid(config.Resolutions, extent, origin, tileSize);
-                    source = new WmtsSourceProvider(wmtsTileGrid, url, paras);
+                case "wmts" :
+                    tileGrid = new WmtsTileGrid(config.Resolutions, extent, origin, tileSize);
+                    source = new WmtsSourceProvider(tileGrid, url, paras);
                     break;
-                case "WMS":
+                case "wms":
                     tileGrid = new TmsTileGrid(config.Resolutions, extent, origin, tileSize);
                     source = new WmsSourceProvider(tileGrid, config.Url, paras);
                     break;
-                case "ARCSERVERREST":
+                case "arcserverrest":
                     tileGrid = new WmtsTileGrid(config.Resolutions, extent, origin, tileSize);//new TileGrid(config.Resolutions, extent, origin, tileSize);
-                    source = new ArcServerRestProvider(tileGrid, config.Url, paras);
+                    source = new ArcServerRestProvider(tileGrid, config.Url, paras, config.OffsetZoom);
                     break;
             }
             return source;
