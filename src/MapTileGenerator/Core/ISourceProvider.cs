@@ -7,7 +7,6 @@ namespace MapTileGenerator.Core
         string GetRequestUrl(TileCoord tileCoord);
        void EnumerateTileRange(TileCoord lastTile, Action<TileCoord> getTileCallback);
         ITileGrid TileGrid { get; }
-
         OutputTile GetOutputTile(TileCoord input, int zoomOffset);
     }
 }

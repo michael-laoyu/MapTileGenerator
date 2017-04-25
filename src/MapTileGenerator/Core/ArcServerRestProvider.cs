@@ -6,14 +6,14 @@ using System.Threading.Tasks;
 
 namespace MapTileGenerator.Core
 {
-    public class ArcServerRestProvider : WmsSourceProvider
+    public class ArcServerRestProvider : WmtsSourceProvider
     {
         private int offsetZoom;
 
-        public ArcServerRestProvider(ITileGrid tileGrid, string url, Dictionary<string, object> paras,int offsetZoom) : 
-                base(tileGrid, url, paras)
+        public ArcServerRestProvider(MapConfig config) : 
+                base(config)
         {
-            this.offsetZoom = offsetZoom;
+            this.offsetZoom = config.OffsetZoom;
         }
 
         public override string GetRequestUrl(TileCoord tileCoord)

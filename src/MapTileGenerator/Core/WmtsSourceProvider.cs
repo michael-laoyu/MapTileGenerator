@@ -8,8 +8,8 @@ namespace MapTileGenerator.Core
 {
     public class WmtsSourceProvider : WmsSourceProvider
     {
-        public WmtsSourceProvider(ITileGrid tileGrid, string url, Dictionary<string, object> paras)
-            :base(tileGrid,url,paras)
+        public WmtsSourceProvider(MapConfig config)
+            :base(config)
         {
 
         }
@@ -36,5 +36,11 @@ namespace MapTileGenerator.Core
             }
             return url;
         }
+
+        protected override ITileGrid CreateTileGrid(double[] resolutions, Extent extent, Coordinate origin, Size tileSize)
+        {
+            return new WmtsTileGrid(resolutions, extent, origin, tileSize);
+        }
+
     }
 }

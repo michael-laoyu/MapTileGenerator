@@ -177,6 +177,7 @@ namespace MapTileGenerator
             using (FileStream fs = new FileStream(Path.Combine(Environment.CurrentDirectory, "mapConfig.json"),
                         FileMode.OpenOrCreate, FileAccess.Write))
             {
+                Console.WriteLine("....");
                 StreamWriter sw = new StreamWriter(fs, Encoding.UTF8);
                 string config = JsonConvert.SerializeObject(this);
                 sw.Write(config);

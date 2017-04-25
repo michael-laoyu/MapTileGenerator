@@ -16,19 +16,16 @@ namespace MapTileGenerator.Core
         protected IDictionary<string, string> _zoomFolderDic = new Dictionary<string, string>();
         protected IDictionary<string,string> _zoomAndXFolderDic = new Dictionary<string, string>();
 
-        public DefaultOutputStrategy(string rootPath)
+        public DefaultOutputStrategy()
         {
-            _rootPath = rootPath;
+            
         }
 
-        #region ITilePathBuilder 成员
+        #region ITileOutputStrategy 成员
 
-        public string RootPath
+        public void Init(string rootPath)
         {
-            get
-            {
-                return _rootPath;
-            }
+            _rootPath = rootPath;
         }
 
         public void Write(Stream input, OutputTile outputTile)

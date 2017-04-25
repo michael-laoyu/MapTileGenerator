@@ -14,11 +14,15 @@ namespace MapTileGenerator.Core
         protected string _url = null;
         protected Dictionary<string, object> _paras = null;
 
-        public WmsSourceProvider(ITileGrid tileGrid, string url, Dictionary<string,object> paras)
+        public WmsSourceProvider(MapConfig config)
         {
-            _tileGrid = tileGrid;
-            _url = url;
-            _paras = paras;
+            var tileSize = new Size(config.TileSize);
+            var extent = new Extent(config.Extent);
+            Coordinate origin = origin = new Coordinate(config.Origin);
+
+            _tileGrid = CreateTileGrid(config.Resolutions, extent, origin, tileSize);
+            _url = config.Url;
+            _paras = config.UrlParas;
         }
 
         public ITileGrid TileGrid
@@ -89,6 +93,11 @@ namespace MapTileGenerator.Core
                 y = Math.Abs(input.Y);
             }
             return new OutputTile((input.Zoom + zoomOffset).ToString(), x.ToString(), y.ToString());
+        }
+
+        protected virtual ITileGrid CreateTileGrid(double[] resolutions, Extent extent, Coordinate origin, Size tileSize)
+        {
+            return new TmsTileGrid(resolutions, extent, origin, tileSize);
         }
     }
 }

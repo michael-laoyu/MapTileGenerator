@@ -79,7 +79,7 @@
     <Compile Include="Core\WmtsSourceProvider.cs" />
     <Compile Include="Core\WmtsTileGrid.cs" />
     <Compile Include="MapConfig.cs" />
-    <Compile Include="Core\TileGenerator.cs" />
+    <Compile Include="TileGenerator.cs" />
     <Compile Include="Core\TmsTileGrid.cs" />
     <Compile Include="Core\WmsSourceProvider.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

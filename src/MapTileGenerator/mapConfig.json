@@ -100,6 +100,7 @@
   "extent": [ 11808770.385317, 3403500.2612752, 11892674.468269, 3442476.25119 ],
   "origin": [ 0, 0 ],
   "type": "baidu",
+  "output": "sqlite",//用sqlite保存瓦片；默认是文件方式存储瓦片
   "url": "http://online3.map.bdimg.com/onlinelabel/?qt=tile&styles=pl&udt=20151021&scaler=1&p=1&qt=tile&x={x}&y={y}&z={z}",
   "runThreadCount":5
 }

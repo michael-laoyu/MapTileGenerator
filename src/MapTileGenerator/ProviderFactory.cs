@@ -12,31 +12,20 @@ namespace MapTileGenerator
     {
         public static ISourceProvider CreateSourceProvider(MapConfig config)
         {
-            var tileSize = new Size(config.TileSize);
-            var extent = new Extent(config.Extent);
-            Coordinate origin = origin = new Coordinate(config.Origin);          
-            string url = config.Url;
-            var paras = config.UrlParas;
-            ISourceProvider source = null;
-            ITileGrid tileGrid = null;          
-
+            ISourceProvider source = null;      
             switch (config.Type.ToLower())
             {
                 case "baidu":
-                    tileGrid = new TmsTileGrid(config.Resolutions, extent, origin, tileSize);
-                    source = new BaiduMapProvider(tileGrid, config.Url, paras,config.OffsetZoom);
+                    source = new BaiduMapProvider(config);
                     break;
                 case "wmts" :
-                    tileGrid = new WmtsTileGrid(config.Resolutions, extent, origin, tileSize);
-                    source = new WmtsSourceProvider(tileGrid, url, paras);
+                    source = new WmtsSourceProvider(config);
                     break;
                 case "wms":
-                    tileGrid = new TmsTileGrid(config.Resolutions, extent, origin, tileSize);
-                    source = new WmsSourceProvider(tileGrid, config.Url, paras);
+                    source = new WmsSourceProvider(config);
                     break;
                 case "arcserverrest":
-                    tileGrid = new WmtsTileGrid(config.Resolutions, extent, origin, tileSize);//new TileGrid(config.Resolutions, extent, origin, tileSize);
-                    source = new ArcServerRestProvider(tileGrid, config.Url, paras, config.OffsetZoom);
+                    source = new ArcServerRestProvider(config);
                     break;
             }
             return source;
@@ -48,13 +37,13 @@ namespace MapTileGenerator
            switch (config.Output.ToLower())
             {
                 case "file":
-                    result = new DefaultOutputStrategy(config.SavePath);
+                    result = new DefaultOutputStrategy();
                     break;
                 case "sqlite":
-                    result = new SqliteOutputStrategy(config.SavePath);
+                    result = new SqliteOutputStrategy();
                     break;
                 default:
-                    result = new DefaultOutputStrategy(config.SavePath);
+                    result = new DefaultOutputStrategy();
                     break;
             }
             return result;

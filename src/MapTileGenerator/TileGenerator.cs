@@ -26,6 +26,7 @@ namespace MapTileGenerator.Core
             _mapConfig = config;
             _source = ProviderFactory.CreateSourceProvider(config);
             _outputStrategy = ProviderFactory.CreateOutputStrategy(config);
+            _outputStrategy.Init(config.SavePath);
             _worker = new Core.QueueTaskWorker<TileCoordWrap>(config.RunThreadCount, GetTile, true);
             _totalTile = _source.TileGrid.TotalTile;
         }
@@ -58,14 +59,6 @@ namespace MapTileGenerator.Core
         }
 
 
-        public ISourceProvider MapSource
-        {
-            get
-            {
-                return _source;
-            }
-        }
-
         public void Start()
         {
             if (_worker != null)
@@ -82,19 +75,31 @@ namespace MapTileGenerator.Core
                    _worker.TryQueue(new TileCoordWrap
                    {
                        Tile = tile,
-                       OnSuccess = null,
+                       OnSuccess = (tile1)=> {                           
+                           Task.Run(() =>
+                           {
+                               OnTileLoaded(tile1);
+                           });                           
+                       },
                        OnFailed = (tile1,ex) =>
                        {
                            _failsStrategy.Insert(tile1);
-                           Console.WriteLine(ex.Message);
+                           Console.WriteLine(string.Format("Tile : zoom ：  {0} x： {1} y ：{2}，有异常：{3}", tile1.Zoom, tile1.X,
+                                                    tile1.Y,ex.Message ));
                        },
                        OnFinally = (tile2) =>
                        {
                            _mapConfig.LastTile = tile2;
-                           if (_currTileIndex == TotalTile)
+                           lock (this)
                            {
-                               _mapConfig.Save();
-                               OnFinished();
+                               if (_currTileIndex == TotalTile)
+                               {
+                                   Task.Run(() =>
+                                   {
+                                       _mapConfig.Save();
+                                       OnFinished();
+                                   });
+                               }
                            }
                        }
                    });
@@ -142,14 +147,13 @@ namespace MapTileGenerator.Core
         private void GetTile(TileCoordWrap tileWrap)
         {
             try
-            {
-                Interlocked.Increment(ref _currTileIndex);
+            {                
                 string url = _source.GetRequestUrl(tileWrap.Tile);
+                Interlocked.Increment(ref _currTileIndex);
                 using (Stream stream = _tileLoadStrategy.GetTile(url))
                 {
                     _outputStrategy.Write(stream, _source.GetOutputTile(tileWrap.Tile, _mapConfig.OffsetZoom));
-                    tileWrap.OnSuccess?.Invoke();
-                    OnTileLoaded(tileWrap.Tile);
+                    tileWrap.OnSuccess?.Invoke(tileWrap.Tile);                    
                 }
             }
             catch (Exception ex)
@@ -173,19 +177,21 @@ namespace MapTileGenerator.Core
                     _worker.TryQueue(new TileCoordWrap
                     {
                         Tile = failTile.ConvertTo(),
-                        OnSuccess = () =>
+                        OnSuccess = (tile1) =>
                         {
+                            //Console.WriteLine(string.Format("Zoom:{0},x:{1},y:{2}", tile1.Zoom, tile1.X, tile1.Y));
+                            //Console.WriteLine(string.Format("Zoom:{0},x:{1},y:{2},ID:{3}", failTile.Zoom, failTile.X, failTile.Y, failTile.Id));
                             _failsStrategy.Delete(failTile);
                         },
-                        OnFailed = (tile,ex) =>
-                        {
-                            Console.WriteLine(ex.Message);
-                        },
+                        OnFailed =null,////重试错误瓦片再次发生错误，不用记录；
                         OnFinally = (tile) =>
                         {
                             if (_currTileIndex == FailTiles)
                             {
-                                OnFinished();
+                                Task.Run(() =>
+                                {
+                                    OnFinished();
+                                });
                             }
                         }
                     });
@@ -197,7 +203,7 @@ namespace MapTileGenerator.Core
     public class TileCoordWrap
     {
         public TileCoord Tile;
-        public Action OnSuccess = null;
+        public Action<TileCoord> OnSuccess = null;
         public Action<TileCoord,Exception> OnFailed = null;
         public Action<TileCoord> OnFinally = null;
     }

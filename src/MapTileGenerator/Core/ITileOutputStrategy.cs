@@ -12,10 +12,8 @@ namespace MapTileGenerator.Core
     /// </summary>
     public interface ITileOutputStrategy
     {
-        string RootPath
-        {
-            get;
-        }
+
+        void Init(string rootPath);
 
         void Write(Stream input,OutputTile outputTile);
     }
@@ -28,7 +26,8 @@ namespace MapTileGenerator.Core
         {
             this.Zoom = zoom;
             this.X = x;
-            this.Y = y;        }
+            this.Y = y;
+        }
 
         public string Zoom;
         public string X;
