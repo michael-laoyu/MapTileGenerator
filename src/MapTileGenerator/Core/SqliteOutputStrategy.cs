@@ -8,7 +8,9 @@ using System.Threading.Tasks;
 namespace MapTileGenerator.Core
 {
     /// <summary>
-    /// 以sqlite数据库方式保存瓦片
+    /// 以sqlite数据库方式保存瓦片,以mbtiles格式保存瓦片；
+    /// mbtiles格式参考：https://github.com/mapbox/mbtiles-spec/
+    ///                 http://blog.csdn.net/zfz1214/article/details/8880644
     /// </summary>
     public class SqliteOutputStrategy : ITileOutputStrategy
     {

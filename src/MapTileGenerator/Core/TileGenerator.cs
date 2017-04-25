@@ -72,7 +72,10 @@ namespace MapTileGenerator.Core
             {
                 _worker.Start();
             }
+            //重试失败的瓦片；
             TryDoFails();
+
+            //从上次失败的瓦片开始下载瓦片
             _source.EnumerateTileRange(_mapConfig.LastTile,               
                (tile) =>
                {
