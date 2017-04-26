@@ -71,25 +71,7 @@
 }
 */
 
-/*
-//ArcServerRest瓦片下载
-/*
-{
-  "resolutions": [
-    0.0013732916427489112,
-    0.0006866458213744556
-  ],
-  "tileSize": [ 256, 256 ],
-  "extent": [ 107.86896617100007, 30.390792641000075, 108.90726196600006, 31.005204326000076 ],
-  "origin": [ -400.0, 399.9999999999998 ],
-  "offsetZoom": 0,//resolutions如果设置了某一部分级别，必须要设置这个偏移量;
-  "type": "ArcServerRest",
-  "url": "http://222.180.68.94:6080/arcgis/rest/services/wzpsp/wzmap/MapServer/tile/{z}/{y}/{x}",
-  "runThreadCount": 1,
-  "savePath": ""
-} 
-*/
-
+/**
 //百度地图下载
 {
   //"resolutions": [ 128, 64, 32 ],
@@ -103,4 +85,21 @@
   "output": "sqlite",//用sqlite保存瓦片；默认是文件方式存储瓦片
   "url": "http://online3.map.bdimg.com/onlinelabel/?qt=tile&styles=pl&udt=20151021&scaler=1&p=1&qt=tile&x={x}&y={y}&z={z}",
   "runThreadCount":5
+}**/
+
+//ArcServerRest瓦片下载
+{
+  "resolutions": [
+    0.0013732916427489112,
+    0.0006866458213744556
+  ],
+  "tileSize": [ 256, 256 ],
+  "extent": [ 107.86896617100007, 30.390792641000075, 108.90726196600006, 31.005204326000076 ],
+  "origin": [ -400.0, 399.9999999999998 ],
+  "offsetZoom": 0, //resolutions如果设置了某一部分级别，必须要设置这个偏移量;
+  "type": "ArcServerRest",
+  "output": "sqlite", //用sqlite保存瓦片；默认是文件方式存储瓦片
+  "url": "http://222.180.68.94:6080/arcgis/rest/services/wzpsp/wzmap/MapServer/tile/{z}/{y}/{x}",
+  "runThreadCount": 5,
+  "savePath": ""
 }
