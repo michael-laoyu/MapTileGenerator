@@ -17,9 +17,10 @@ namespace MapTileGenerator.Core
         private FailTilesOutputStrategy _failsStrategy = new FailTilesOutputStrategy();
         private QueueTaskWorker<TileCoordWrap> _worker = null;
         private MapConfig _mapConfig = null;
+        private LimitedQueue<TileCoord> _lastTiles = null;
 
         public EventHandler<TileCoord> TileLoaded;
-        public EventHandler Finished;
+        public EventHandler<string> Finished;
 
         public TileGenerator(MapConfig config)
         {
@@ -29,11 +30,16 @@ namespace MapTileGenerator.Core
             _outputStrategy.Init(config.SavePath);
             _worker = new Core.QueueTaskWorker<TileCoordWrap>(config.RunThreadCount, GetTile, true);
             _totalTile = _source.TileGrid.TotalTile;
+            _lastTiles = new Core.LimitedQueue<Core.TileCoord>(config.RunThreadCount);
+            _successTileIndex = config.Result.SuccessTiles;
+            _currTileIndex = config.Result.LastTileIndex;
         }
 
         private int _successTileIndex = 0;
+        private int _failRetrySuccessIndex = 0;
+        private int _failRetryIndex = 0;
         private int _currTileIndex = 0;
-        public int SuccessTileIndex
+        public int SuccessTile
         {
             get
             {
@@ -68,14 +74,15 @@ namespace MapTileGenerator.Core
             //重试失败的瓦片；
             TryDoFails();
 
-            //从上次失败的瓦片开始下载瓦片
-            _source.EnumerateTileRange(_mapConfig.LastTile,               
+            //从最后一次的瓦片开始下载瓦片
+            _source.EnumerateTileRange(_mapConfig.Result.LastTile,               
                (tile) =>
                {
                    _worker.TryQueue(new TileCoordWrap
                    {
                        Tile = tile,
-                       OnSuccess = (tile1)=> {                           
+                       OnSuccess = (tile1)=> {
+                           Interlocked.Increment(ref _successTileIndex);
                            Task.Run(() =>
                            {
                                OnTileLoaded(tile1);
@@ -89,15 +96,14 @@ namespace MapTileGenerator.Core
                        },
                        OnFinally = (tile2) =>
                        {
-                           _mapConfig.LastTile = tile2;
                            lock (this)
                            {
-                               if (_currTileIndex == TotalTile)
+                               if (_currTileIndex >= TotalTile)
                                {
                                    Task.Run(() =>
                                    {
-                                       _mapConfig.Save();
-                                       OnFinished();
+                                       var msg = string.Format("{瓦片下载完成... 完成情况：{0}/{1}，失败：{2}!", _successTileIndex, TotalTile, FailTiles);
+                                       OnFinished(msg);
                                    });
                                }
                            }
@@ -114,7 +120,22 @@ namespace MapTileGenerator.Core
 
         public void Close()
         {
+            if (_lastTiles.Count > 0)
+            {
+                var min = _lastTiles.Min(tile => tile.Index);
+                var minTile = _lastTiles.Where(tile => tile.Index == min).ToList();
+
+                if(minTile!=null && minTile.Count>0)
+                {                    
+                    _mapConfig.Result.LastTile = minTile[0];
+                }                                
+            }
+            _mapConfig.Result.SuccessTiles = SuccessTile;            
+            _mapConfig.Result.FailTiles = FailTiles;
+            _mapConfig.Result.LastTileIndex = _mapConfig.Result.LastTile != null ? _mapConfig.Result.LastTile.Index : _currTileIndex;
+
             _mapConfig.Save();
+
             if (_worker != null)
             {
                 _worker.Close();
@@ -131,29 +152,32 @@ namespace MapTileGenerator.Core
         #endregion
 
         protected virtual void OnTileLoaded(TileCoord tileCoord)
-        {
-            Interlocked.Increment(ref _successTileIndex);
+        {            
             if (this.TileLoaded != null)
             {
                 TileLoaded(this, tileCoord);
             }
         }
 
-        protected virtual void OnFinished()
+        protected virtual void OnFinished(string msg)
         {
-            this.Finished?.Invoke(this, EventArgs.Empty);
+            this.Finished?.Invoke(this, msg);
         }
 
-        private void GetTile(TileCoordWrap tileWrap)
+        protected virtual void GetTile(TileCoordWrap tileWrap)
         {
             try
             {                
                 string url = _source.GetRequestUrl(tileWrap.Tile);
                 Interlocked.Increment(ref _currTileIndex);
+                lock (_lastTiles)
+                {
+                    _lastTiles.Enqueue(tileWrap.Tile);//记录最后一次Tile，下次执行时继续。
+                }
                 using (Stream stream = _tileLoadStrategy.GetTile(url))
                 {
                     _outputStrategy.Write(stream, _source.GetOutputTile(tileWrap.Tile, _mapConfig.OffsetZoom));
-                    tileWrap.OnSuccess?.Invoke(tileWrap.Tile);                    
+                    tileWrap.OnSuccess.Invoke(tileWrap.Tile);                    
                 }
             }
             catch (Exception ex)
@@ -172,26 +196,35 @@ namespace MapTileGenerator.Core
             var failTiles = _failsStrategy.Load(failsDb);
             if (failTiles != null)
             {
-                foreach (FailTileDto failTile in failTiles)
+                foreach (TileCoord failTile in failTiles)
                 {
                     _worker.TryQueue(new TileCoordWrap
                     {
-                        Tile = failTile.ConvertTo(),
-                        OnSuccess = (tile1) =>
+                        Tile = failTile,
+                        OnSuccess = (tile) =>
                         {
-                            //Console.WriteLine(string.Format("Zoom:{0},x:{1},y:{2}", tile1.Zoom, tile1.X, tile1.Y));
-                            //Console.WriteLine(string.Format("Zoom:{0},x:{1},y:{2},ID:{3}", failTile.Zoom, failTile.X, failTile.Y, failTile.Id));
-                            _failsStrategy.Delete(failTile);
-                        },
-                        OnFailed =null,////重试错误瓦片再次发生错误，不用记录；
-                        OnFinally = (tile) =>
-                        {
-                            if (_currTileIndex == FailTiles)
+                            _failsStrategy.Delete(tile);
+                            Interlocked.Increment(ref _failRetrySuccessIndex);
+                            Task.Run(() =>
                             {
-                                Task.Run(() =>
+                                OnTileLoaded(tile);
+                            });
+                        },
+                        OnFailed = (tile1,ex)=> {
+                            Console.WriteLine(string.Format("Tile : zoom ：  {0} x： {1} y ：{2}，有异常：{3}", tile1.Zoom, tile1.X,
+                                                   tile1.Y, ex.Message));
+                        },////重试错误瓦片再次发生错误，不用记录；
+                        OnFinally = (tile2) =>
+                        {
+                            lock (this)
+                            {
+                                Interlocked.Increment(ref _failRetrySuccessIndex);
+                                Interlocked.Increment(ref _currTileIndex);
+                                if (_failRetryIndex >= FailTiles)
                                 {
-                                    OnFinished();
-                                });
+                                    var msg = string.Format("失败瓦片重试完成...完成情况：{0}/{1}，失败：{2}!", _failRetrySuccessIndex, FailTiles, FailTiles- _failRetryIndex);
+                                    OnFinished(msg);
+                                }
                             }
                         }
                     });

@@ -22,6 +22,7 @@ namespace MapTileGenerator.Core
             //return response.GetResponseStream();
 
             HttpClient httpClient = new HttpClient();
+            httpClient.Timeout = TimeSpan.FromSeconds(10);
             return httpClient.GetStreamAsync(url).Result;
         }
 

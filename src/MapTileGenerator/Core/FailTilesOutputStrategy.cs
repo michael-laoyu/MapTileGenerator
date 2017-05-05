@@ -15,7 +15,7 @@ namespace MapTileGenerator.Core
         public const string FILENAME = "fails.db";
         public int Count = 0;
 
-        public List<FailTileDto> Load(string file)
+        public List<TileCoord> Load(string file)
         {
             try
             {
@@ -24,11 +24,11 @@ namespace MapTileGenerator.Core
 
                 if (File.Exists(file))
                 {
-                    var sql = @"select ID,Zoom,X,Y from FailTile;";
-                    var list = new List<FailTileDto>();
+                    var sql = @"select Zoom,X,Y,[Index] from FailTile;";
+                    var list = new List<TileCoord>();
                     using (var conn = new SQLiteConnection(_sqliteConnectionString))
                     {
-                        list = conn.Query<FailTileDto>(sql) as List<FailTileDto>;
+                        list = conn.Query<TileCoord>(sql) as List<TileCoord>;
                         Count = list.Count;
                         return list;
                     }
@@ -44,7 +44,8 @@ namespace MapTileGenerator.Core
                                 [Id] integer PRIMARY KEY autoincrement,-- 设置自增长主键
                                 [Zoom] int,
                                 [X]  double,
-                                [Y] double 
+                                [Y] double ,
+                                [Index] int
                             );";
                     SQLiteCommand command = new SQLiteCommand(sql, conn);
                     command.ExecuteNonQuery();
@@ -61,7 +62,7 @@ namespace MapTileGenerator.Core
         {
             try
             {
-                var sql = @"insert into FailTile(Zoom,X,Y) values(@Zoom,@X,@Y);";
+                var sql = @"insert into FailTile(Zoom,X,Y,[Index]) values(@Zoom,@X,@Y,@Index);";
                 int ret = 0;
                 using (var conn = new SQLiteConnection(_sqliteConnectionString))
                 {
@@ -69,13 +70,11 @@ namespace MapTileGenerator.Core
                     {
                         Zoom = tile.Zoom,
                         X = tile.X,
-                        Y = tile.Y
+                        Y = tile.Y,
+                        Index = tile.Index
                     });
                 }
-                if (ret > 0)
-                {
-                    System.Threading.Interlocked.Increment(ref Count);
-                }
+                System.Threading.Interlocked.Increment(ref Count);
             }
             catch (Exception ex)
             {
@@ -83,23 +82,20 @@ namespace MapTileGenerator.Core
             }
         }
 
-        public void Delete(FailTileDto failTile)
+        public void Delete(TileCoord failTile)
         {
             try
             {
-                var sql = @"delete from FailTile where Id=@Id;";
+                var sql = @"delete from FailTile where [Index]=@Index;";
                 int ret = 0;
                 using (var conn = new SQLiteConnection(_sqliteConnectionString))
                 {
                     ret = conn.Execute(sql, new
                     {
-                        Id = failTile.Id
+                        Index = failTile.Index
                     });
                 }
-                if (ret > 0)
-                {
-                    System.Threading.Interlocked.Decrement(ref Count);
-                }
+                System.Threading.Interlocked.Decrement(ref Count);
             }
             catch (Exception ex)
             {
@@ -108,41 +104,41 @@ namespace MapTileGenerator.Core
         }
     }
 
-    public class FailTileDto
-    {
-        public FailTileDto() { }
+    //public class FailTileDto
+    //{
+    //    public FailTileDto() { }
 
-        public FailTileDto(int id, int zoom, double x, double y)
-        {
-            Zoom = zoom;
-            X = x;
-            Y = y;
-        }
+    //    public FailTileDto(int id, int zoom, double x, double y)
+    //    {
+    //        Zoom = zoom;
+    //        X = x;
+    //        Y = y;
+    //    }
 
-        public TileCoord ConvertTo()
-        {
-            return new Core.TileCoord(Zoom, X, Y);
-        }
+    //    public TileCoord ConvertTo()
+    //    {
+    //        return new Core.TileCoord(Zoom, X, Y);
+    //    }
 
-        public int Id
-        {
-            get;
-            set;
-        }
-        public int Zoom
-        {
-            get;
-            set;
-        }
-        public double X
-        {
-            get;
-            set;
-        }
-        public double Y
-        {
-            get;
-            set;
-        }
-    }
+    //    public int Id
+    //    {
+    //        get;
+    //        set;
+    //    }
+    //    public int Zoom
+    //    {
+    //        get;
+    //        set;
+    //    }
+    //    public double X
+    //    {
+    //        get;
+    //        set;
+    //    }
+    //    public double Y
+    //    {
+    //        get;
+    //        set;
+    //    }
+    //}
 }

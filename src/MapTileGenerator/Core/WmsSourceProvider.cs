@@ -58,22 +58,41 @@ namespace MapTileGenerator.Core
             return url;
         }
 
-        public virtual void EnumerateTileRange(TileCoord lastTile/*为了实现续载功能，从上次失败的点开始继续*/,
+        public virtual void EnumerateTileRange(TileCoord beginTile/*为了实现续载功能，从上次失败的点开始继续*/,
                                     Action<TileCoord> getTileCallback)
         {
-            int minZoom = 0;
-            if (lastTile != null)
-            {
-                minZoom = lastTile.Zoom;//从失败的那一级别开始下载。
-            }
             List<Extent> fullTileRange = _tileGrid.TileRanges;
-            for (int z = minZoom; z < fullTileRange.Count; z++)
+
+            int minZoom = 0, index = 0;
+            double minX = fullTileRange[minZoom].MinX,minY = fullTileRange[minZoom].MinY;
+            if (beginTile != null)
             {
+                minZoom = beginTile.Zoom;//从失败的那一级别开始下载。
+                minX = beginTile.X;
+                minY = beginTile.Y;
+            }
+
+            
+            for (double x = minX; x <= fullTileRange[minZoom].MaxX; ++x)           
+            {
+                for (double y = minY; y <= fullTileRange[minZoom].MaxY; ++y)               
+                {
+                    ++index;
+                    var tile = new TileCoord(minZoom, x, y,index);
+                    getTileCallback(tile);
+                }
+            }
+
+            for (int z = minZoom+1; z < fullTileRange.Count; z++)
+            {
+                //for (double x = minX; x <= fullTileRange[z].MaxX; ++x)
                 for (double x = fullTileRange[z].MinX; x <= fullTileRange[z].MaxX; ++x)
                 {
+                    //for (double y = minY; y <= fullTileRange[z].MaxY; ++y)
                     for (double y = fullTileRange[z].MinY; y <= fullTileRange[z].MaxY; ++y)
                     {
-                        var tile = new TileCoord(z, x, y);
+                        ++index;
+                        var tile = new TileCoord(z, x, y,index);
                         getTileCallback(tile);
                     }
                 }

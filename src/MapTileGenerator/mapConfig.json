@@ -71,12 +71,12 @@
 }
 */
 
-/**
+
 //百度地图下载
 {
   //"resolutions": [ 128, 64, 32 ],
   //"resolutions": [ 262144, 131072, 65536, 32768, 16384, 8192, 4096, 2048, 1024, 512, 256, 128, 64, 32, 16, 8, 4, 2, 1 ],//完整的resolutions
-  "resolutions": [  256,128,64,32,16 ],
+  "resolutions": [  256,128,64,32],
   "offsetZoom": 10, //resolutions如果设置了某一部分级别，必须要设置这个偏移量;
   "tileSize": [ 256,256 ],
   "extent": [ 11808770.385317, 3403500.2612752, 11892674.468269, 3442476.25119 ],
@@ -85,10 +85,10 @@
   "output": "sqlite",//用sqlite保存瓦片；默认是文件方式存储瓦片
   "url": "http://online3.map.bdimg.com/onlinelabel/?qt=tile&styles=pl&udt=20151021&scaler=1&p=1&qt=tile&x={x}&y={y}&z={z}",
   "runThreadCount":5
-}**/
+}
 
-//ArcServerRest瓦片下载
-{
+/**
+  / /ArcServerRest瓦片下载 {
   "resolutions": [
     0.0013732916427489112,
     0.0006866458213744556
@@ -103,3 +103,4 @@
   "runThreadCount": 5,
   "savePath": ""
 }
+**/

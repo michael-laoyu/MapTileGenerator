@@ -138,8 +138,20 @@ namespace MapTileGenerator
             set;
         }
 
-        [JsonProperty("lastTile")]
-        public TileCoord LastTile;
+        private MapResult _mapResult = new MapResult();
+        [JsonProperty("result")]
+        public MapResult Result
+        {
+            get
+            {
+                return _mapResult;
+            }
+            set
+            {
+                _mapResult = value;
+            }
+        }
+
 
         public static MapConfig Load()
         {
@@ -174,14 +186,24 @@ namespace MapTileGenerator
 
         public void Save()
         {
-            using (FileStream fs = new FileStream(Path.Combine(Environment.CurrentDirectory, "mapConfig.json"),
-                        FileMode.OpenOrCreate, FileAccess.Write))
+            using (FileStream fs = new FileStream(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "mapConfig.json"),
+                        FileMode.Create, FileAccess.Write))
             {
-                Console.WriteLine("....");
-                StreamWriter sw = new StreamWriter(fs, Encoding.UTF8);
-                string config = JsonConvert.SerializeObject(this);
-                sw.Write(config);
+                Console.WriteLine("mapconfig save...");
+                StreamWriter sw = new StreamWriter(fs, Encoding.UTF8);               
+                string text = JsonConvert.SerializeObject(this);
+                sw.Write(text);
+                sw.Flush();
             }
         }
+    }
+
+    public class MapResult
+    {
+        public int TotalTiles;
+        public int SuccessTiles;
+        public int FailTiles;
+        public TileCoord LastTile;
+        public int LastTileIndex;
     }
 }

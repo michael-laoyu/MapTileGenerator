@@ -111,13 +111,15 @@ namespace MapTileGenerator.Core
 
     public class TileCoord
     {
-        public TileCoord(int zoom, double x, double y)
+        public TileCoord(int zoom, double x, double y,int index)
         {
             Zoom = zoom;
             X = x;
             Y = y;
+            Index = index;
         }
 
+        public int Index;   
         public int Zoom;
         public double X;
         public double Y;
