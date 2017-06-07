@@ -27,6 +27,9 @@ namespace MapTileGenerator
                 case "arcserverrest":
                     source = new ArcServerRestProvider(config);
                     break;
+                case "arcserverlocaltile":
+                    source = new ArcServerLocalTileProvider(config);
+                    break;
             }
             return source;
         }

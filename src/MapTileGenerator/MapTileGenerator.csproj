@@ -63,6 +63,7 @@
     <Reference Include="System.Xml.Linq" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Core\ArcServerLocalTileProvider.cs" />
     <Compile Include="Core\ArcServerRestProvider.cs" />
     <Compile Include="Core\BaiduMapProvider.cs" />
     <Compile Include="Core\LimitedQueue.cs" />
@@ -86,9 +87,8 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="App.config" />
     <None Include="mapConfig.json">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
     <None Include="packages.config" />
   </ItemGroup>

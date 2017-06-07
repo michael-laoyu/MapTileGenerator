@@ -41,13 +41,23 @@ namespace MapTileGenerator.Core
 
             if (!File.Exists(db))
             {
+                Directory.CreateDirectory(Path.GetDirectoryName(db));
                 //创建空库与空表，创建索引
                 SQLiteConnection.CreateFile(db);
                 var conn = new SQLiteConnection(_sqliteConnectionString);
                 conn.Open();
 
+                //创建索引；
                 string sql = @"CREATE TABLE tiles (zoom_level TEXT, tile_column INTEGER, tile_row INTEGER, tile_data  BLOB);";
                 SQLiteCommand command = new SQLiteCommand(sql, conn);
+                command.ExecuteNonQuery();
+
+                //创建索引；
+                sql = @"--DROP INDEX idx_tiles;
+CREATE INDEX idx_tiles
+  ON tiles
+  (zoom_level, tile_row, tile_column);";
+                command = new SQLiteCommand(sql, conn);
                 command.ExecuteNonQuery();
             }
         }

@@ -72,20 +72,20 @@
 */
 
 
-//百度地图下载
-{
+/* /百度地图下载 {
   //"resolutions": [ 128, 64, 32 ],
   //"resolutions": [ 262144, 131072, 65536, 32768, 16384, 8192, 4096, 2048, 1024, 512, 256, 128, 64, 32, 16, 8, 4, 2, 1 ],//完整的resolutions
-  "resolutions": [  256,128,64,32],
+  "resolutions": [ 256, 128, 64, 32 ],
   "offsetZoom": 10, //resolutions如果设置了某一部分级别，必须要设置这个偏移量;
-  "tileSize": [ 256,256 ],
+  "tileSize": [ 256, 256 ],
   "extent": [ 11808770.385317, 3403500.2612752, 11892674.468269, 3442476.25119 ],
   "origin": [ 0, 0 ],
   "type": "baidu",
-  "output": "sqlite",//用sqlite保存瓦片；默认是文件方式存储瓦片
+  "output": "sqlite", //用sqlite保存瓦片；默认是文件方式存储瓦片
   "url": "http://online3.map.bdimg.com/onlinelabel/?qt=tile&styles=pl&udt=20151021&scaler=1&p=1&qt=tile&x={x}&y={y}&z={z}",
-  "runThreadCount":5
-}
+  "runThreadCount": 5
+} 
+*/
 
 /**
   / /ArcServerRest瓦片下载 {
@@ -104,3 +104,25 @@
   "savePath": ""
 }
 **/
+
+  //ArcServer本地缓存的瓦片下载，目的是为了生成标准的xyz方式的瓦片以及sqlite存储的瓦片
+  {
+  "resolutions": [   
+            0.00015228550437313792,
+            0.000076142752186568962,
+            0.000038071376093284481,
+            0.00001903568804664224,
+            0.0000095178440233211202
+            //,0.0000047589220116605601,
+            //0.0000023794610058302801
+  ],
+  "tileSize": [ 256, 256 ],
+  "extent": [ 113.3946038380694, 34.0858360155829, 113.5505441945475, 34.2026389974371 ],
+  "origin": [ -400.0, 400 ],
+  "offsetZoom": 3, //resolutions如果设置了某一部分级别，必须要设置这个偏移量;
+  "type": "ArcServerLocalTile",
+  "output": "sqlite", //用sqlite保存瓦片；默认是文件方式存储瓦片
+  "url": "http://192.168.20.34/YZMAP/{z}/{y}/{x}.png",
+  "runThreadCount": 1,
+  "savePath": ""
+}
