@@ -66,6 +66,7 @@
     <Compile Include="Core\ArcServerLocalTileProvider.cs" />
     <Compile Include="Core\ArcServerRestProvider.cs" />
     <Compile Include="Core\BaiduMapProvider.cs" />
+    <Compile Include="Core\GaodeMapProvider.cs" />
     <Compile Include="Core\LimitedQueue.cs" />
     <Compile Include="Core\FailTilesOutputStrategy.cs" />
     <Compile Include="Core\ITileGrid.cs" />
@@ -77,6 +78,7 @@
     <Compile Include="Core\ITileLoadStrategy.cs" />
     <Compile Include="Core\ITileOutputStrategy.cs" />
     <Compile Include="Core\SqliteOutputStrategy.cs" />
+    <Compile Include="Core\TencentMapProvider.cs" />
     <Compile Include="ProviderFactory.cs" />
     <Compile Include="Core\WmtsSourceProvider.cs" />
     <Compile Include="Core\WmtsTileGrid.cs" />

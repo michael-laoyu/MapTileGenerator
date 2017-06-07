@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace MapTileGenerator.Core
 {
-    public class ArcServerLocalTileProvider : WmtsSourceProvider
+    public class ArcServerLocalTileProvider : WmtsSourceProvider //: WmsSourceProvider//
     {
         private int offsetZoom;
 
@@ -19,7 +19,8 @@ namespace MapTileGenerator.Core
         public override string GetRequestUrl(TileCoord tileCoord)
         {
             var x = 'C' + padLeft(Convert.ToInt32(tileCoord.X), 8, 16);
-            var y = 'R' + padLeft(Convert.ToInt32(tileCoord.Y), 8, 16);
+            var y = 'R' + padLeft(Convert.ToInt32(tileCoord.Y), 8, 16);//WMTS
+            //var y = 'R' + padLeft(Convert.ToInt32(-1 * tileCoord.Y -1), 8, 16);//TMS
             var z = 'L' + padLeft(Convert.ToInt32(tileCoord.Zoom) + offsetZoom, 2, 10);
 
             string url = this._url;

@@ -18,6 +18,13 @@ namespace MapTileGenerator
                 case "baidu":
                     source = new BaiduMapProvider(config);
                     break;
+                case "gaode":
+                    source = new GaodeMapProvider(config);
+                    break;
+                case "tencent":
+                    source = new TencentMapProvider(config);
+                    break;
+
                 case "wmts" :
                     source = new WmtsSourceProvider(config);
                     break;
