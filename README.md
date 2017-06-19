@@ -1,12 +1,10 @@
 # MapTileGenerator
-<<<<<<< HEAD
-支持TMS、WMTS标准瓦片下载，支持百度地图瓦片、天地图、ArcGIS Rest、geoserver等瓦片下载。默认以png文件方式保存瓦片，支持以sqlite（[mbtiles格式](https://github.com/mapbox/mbtiles-spec)）保存瓦片，支持瓦片base64编码后以sqlite保存（用于android端离线地图）。
-=======
-支持TMS、WMTS标准瓦片下载，支持百度地图瓦片、高德地图瓦片、腾讯地图瓦片、天地图、ArcGIS Rest、geoserver等瓦片下载。默认以png文件方式保存瓦片，也支持以sqlite（[mbtiles格式](https://github.com/mapbox/mbtiles-spec)）保存瓦片。
->>>>>>> origin/master
+
+支持TMS、WMTS标准瓦片下载，支持百度地图瓦片、高德地图瓦片、腾讯地图瓦片、天地图、ArcServer Rest瓦片、ArcServer本地缓存切片、geoserver WMS等瓦片下载。默认以png文件方式保存瓦片，也支持以sqlite（[mbtiles格式](https://github.com/mapbox/mbtiles-spec)）保存瓦片，支持瓦片base64编码后以sqlite保存（用于android端离线地图）。
+
 
 ## 使用说明：
-设置mapConfig.json，根据配置项请求瓦片，支持多线程方式。下载失败的瓦片用sqlite数据库保存在{savePath}\fails.db，下次启动程序时会重新下载失败瓦片。程序运行中途退出时，下次启动程序将会从上次退出的进度继续下载。
+设置mapConfig.json，根据配置项请求瓦片，支持多线程下载，失败续载。下载失败的瓦片用sqlite数据库保存在{savePath}\fails.db，第二次启动程序时会重新下载失败瓦片。程序运行中途退出时，第二次启动程序将会从上次退出的进度继续下载。
 
 ### geoserver wms瓦片下载配置  
     {        
