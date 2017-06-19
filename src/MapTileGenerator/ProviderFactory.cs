@@ -52,6 +52,9 @@ namespace MapTileGenerator
                 case "sqlite":
                     result = new SqliteOutputStrategy();
                     break;
+                case "sqliteandbase64":
+                    result = new SqliteAndBase64OutputStrategy();
+                    break;
                 default:
                     result = new DefaultOutputStrategy();
                     break;

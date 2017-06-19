@@ -192,6 +192,7 @@
   "extent": [-20037508.342789244, -20037508.342789244, 20037508.342789244, 20037508.342789244],
   "origin": [-20037508.342789244, -20037508.342789244],
   "type": "tencent",
+  "output": "sqliteAndBase64", //用sqlite保存瓦片；默认是文件方式存储瓦片
   "url": "http://rt1.map.gtimg.com/realtimerender?z={z}&x={x}&y={y}&type=vector&style=0&v=1.1.2",
   "runThreadCount": 1
 }
