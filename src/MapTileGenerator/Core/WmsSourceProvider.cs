@@ -55,6 +55,8 @@ namespace MapTileGenerator.Core
             {
                 url += (item.Key + "=" + item.Value.ToString() + "&");
             }
+            //Console.WriteLine(string.Format("x:{0},y:{1},zoom:{2},bbox:{3},url:{4}",tileCoord.X,tileCoord.Y,
+            //    tileCoord.Zoom,tileExtent,url));
             return url;
         }
 
@@ -64,7 +66,8 @@ namespace MapTileGenerator.Core
             List<Extent> fullTileRange = _tileGrid.TileRanges;
 
             int minZoom = 0, index = 0;
-            double minX = fullTileRange[minZoom].MinX,minY = fullTileRange[minZoom].MinY;
+            double minX = fullTileRange[minZoom].MinX;
+            double minY = fullTileRange[minZoom].MinY;
             if (beginTile != null)
             {
                 minZoom = beginTile.Zoom;//从失败的那一级别开始下载。

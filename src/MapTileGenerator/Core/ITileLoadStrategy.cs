@@ -9,6 +9,6 @@ namespace MapTileGenerator.Core
 {
    public  interface ITileLoadStrategy
     {
-        Stream GetTile(string url);
+        Stream GetTile(string url,int timeout);
     }
 }

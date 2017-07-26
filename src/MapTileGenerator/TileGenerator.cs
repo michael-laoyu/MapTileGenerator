@@ -174,7 +174,7 @@ namespace MapTileGenerator.Core
                 {
                     _lastTiles.Enqueue(tileWrap.Tile);//记录最后一次Tile，下次执行时继续。
                 }
-                using (Stream stream = _tileLoadStrategy.GetTile(url))
+                using (Stream stream = _tileLoadStrategy.GetTile(url,_mapConfig.Timeout))
                 {
                     _outputStrategy.Write(stream, _source.GetOutputTile(tileWrap.Tile, _mapConfig.OffsetZoom));
                     tileWrap.OnSuccess.Invoke(tileWrap.Tile);                    

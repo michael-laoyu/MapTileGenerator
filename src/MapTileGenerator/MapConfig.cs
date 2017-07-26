@@ -152,6 +152,13 @@ namespace MapTileGenerator
             }
         }
 
+        [JsonProperty("timeout")]
+        public int Timeout
+        {
+            get;
+            set;
+        }
+
 
         public static MapConfig Load()
         {

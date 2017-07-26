@@ -14,15 +14,18 @@ namespace MapTileGenerator.Core
 
         #region ITileLoadStrategy 成员
 
-        public Stream GetTile(string url)
+        public Stream GetTile(string url,int timeout)
         {
             //HttpWebRequest request = WebRequest.Create(url) as HttpWebRequest;
             //request.Timeout = 3000;
             //WebResponse response = request.GetResponse();
             //return response.GetResponseStream();
-
+            if (timeout <= 10)
+            {
+                timeout = 10;
+            }
             HttpClient httpClient = new HttpClient();
-            httpClient.Timeout = TimeSpan.FromSeconds(10);
+            httpClient.Timeout = TimeSpan.FromSeconds(timeout);
             return httpClient.GetStreamAsync(url).Result;
         }
 
