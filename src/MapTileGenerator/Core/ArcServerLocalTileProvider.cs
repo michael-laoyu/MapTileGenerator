@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace MapTileGenerator.Core
 {
-    public class ArcServerLocalTileProvider : WmtsSourceProvider //: WmsSourceProvider//
+    public class ArcServerLocalTileProvider : WmtsSourceProvider 
     {
         private int offsetZoom;
 

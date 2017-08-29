@@ -6,22 +6,13 @@ using System.Threading.Tasks;
 
 namespace MapTileGenerator.Core
 {
-    public class TencentMapProvider : WmsSourceProvider
+    /// <summary>
+    /// 腾讯地图
+    /// </summary>
+    public class TencentMapProvider : TmsSourceProvider
     {
         public TencentMapProvider(MapConfig config) : base(config)
         {
-            offsetZoom = config.OffsetZoom;
-        }
-
-        private int offsetZoom;
-
-        public override string GetRequestUrl(TileCoord tileCoord)
-        {
-            string url = this._url;
-            url = url.Replace("{z}", (offsetZoom + tileCoord.Zoom).ToString());
-            url = url.Replace("{x}", tileCoord.X.ToString());
-            url = url.Replace("{y}", tileCoord.Y.ToString());
-            return url;
         }
 
     }

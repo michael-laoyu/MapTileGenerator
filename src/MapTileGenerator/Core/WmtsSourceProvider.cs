@@ -6,7 +6,10 @@ using System.Threading.Tasks;
 
 namespace MapTileGenerator.Core
 {
-    public class WmtsSourceProvider : WmsSourceProvider
+    /// <summary>
+    /// geoserver wmts或其他标准的WMTS（例如：天地图）
+    /// </summary>
+    public class WmtsSourceProvider : TmsSourceProvider
     {
         public WmtsSourceProvider(MapConfig config)
             :base(config)

@@ -8,32 +8,20 @@ using System.Threading.Tasks;
 
 namespace MapTileGenerator.Core
 {
-    public class WmsSourceProvider : ISourceProvider
+    /// <summary>
+    /// geoserver wms或其他标准的WMS服务
+    /// </summary>
+    public class WmsSourceProvider : TmsSourceProvider
     {
-        protected ITileGrid _tileGrid = null;
-        protected string _url = null;
-        protected Dictionary<string, object> _paras = null;
 
         public WmsSourceProvider(MapConfig config)
+            : base(config)
         {
-            var tileSize = new Size(config.TileSize);
-            var extent = new Extent(config.Extent);
-            Coordinate origin = origin = new Coordinate(config.Origin);
-
-            _tileGrid = CreateTileGrid(config.Resolutions, extent, origin, tileSize);
-            _url = config.Url;
-            _paras = config.UrlParas;
+          
         }
 
-        public ITileGrid TileGrid
-        {
-            get
-            {
-                return _tileGrid;
-            }
-        }
 
-        public virtual string GetRequestUrl(TileCoord tileCoord)
+        public override string GetRequestUrl(TileCoord tileCoord)
         {
             Extent tileExtent = _tileGrid.GetTileExtent(tileCoord);
             string url = this._url;
@@ -58,68 +46,6 @@ namespace MapTileGenerator.Core
             //Console.WriteLine(string.Format("x:{0},y:{1},zoom:{2},bbox:{3},url:{4}",tileCoord.X,tileCoord.Y,
             //    tileCoord.Zoom,tileExtent,url));
             return url;
-        }
-
-        public virtual void EnumerateTileRange(TileCoord beginTile/*为了实现续载功能，从上次失败的点开始继续*/,
-                                    Action<TileCoord> getTileCallback)
-        {
-            List<Extent> fullTileRange = _tileGrid.TileRanges;
-
-            int minZoom = 0, index = 0;
-            double minX = fullTileRange[minZoom].MinX;
-            double minY = fullTileRange[minZoom].MinY;
-            if (beginTile != null)
-            {
-                minZoom = beginTile.Zoom;//从失败的那一级别开始下载。
-                minX = beginTile.X;
-                minY = beginTile.Y;
-            }
-
-            
-            for (double x = minX; x <= fullTileRange[minZoom].MaxX; ++x)           
-            {
-                for (double y = minY; y <= fullTileRange[minZoom].MaxY; ++y)               
-                {
-                    ++index;
-                    var tile = new TileCoord(minZoom, x, y,index);
-                    getTileCallback(tile);
-                }
-            }
-
-            for (int z = minZoom+1; z < fullTileRange.Count; z++)
-            {
-                //for (double x = minX; x <= fullTileRange[z].MaxX; ++x)
-                for (double x = fullTileRange[z].MinX; x <= fullTileRange[z].MaxX; ++x)
-                {
-                    //for (double y = minY; y <= fullTileRange[z].MaxY; ++y)
-                    for (double y = fullTileRange[z].MinY; y <= fullTileRange[z].MaxY; ++y)
-                    {
-                        ++index;
-                        var tile = new TileCoord(z, x, y,index);
-                        getTileCallback(tile);
-                    }
-                }
-            }
-        }
-
-        public virtual OutputTile GetOutputTile(TileCoord input, int zoomOffset)
-        {
-            double x = input.X,
-                        y = input.Y;
-            if (input.X < 0)
-            {
-                x = Math.Abs(input.X);
-            }
-            if (input.Y < 0)
-            {
-                y = Math.Abs(input.Y);
-            }
-            return new OutputTile((input.Zoom + zoomOffset).ToString(), x.ToString(), y.ToString());
-        }
-
-        protected virtual ITileGrid CreateTileGrid(double[] resolutions, Extent extent, Coordinate origin, Size tileSize)
-        {
-            return new TmsTileGrid(resolutions, extent, origin, tileSize);
         }
     }
 }

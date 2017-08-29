@@ -1,0 +1,121 @@
+﻿<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <script type="text/javascript" src="http://api.map.baidu.com/api?v=2.0&ak=1nCQCnDr3Nt3GKDVeBmKGe2Y"></script>
+    <script src="JS/coordTransform.js"></script>
+    <style type="text/css">
+        body, html, #allmap {
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            margin: 0;
+        }
+    </style>
+    <title></title>
+</head>
+<body>
+    <form id="form1" runat="server">
+        <div id="divContainer" style="overflow: scroll">
+            <div style="width: 100%; height: 600px; border: solid 1px red;" id="allmap"></div>
+        </div>
+    </form>
+    <script type="text/javascript">
+        var map;
+        var icon = new BMap.Icon('img/center.gif', new BMap.Size(24, 24));
+        var resolutions = [262144, 131072, 65536, 32768, 16384, 8192, 4096, 2048, 1024, 512, 256, 128, 64, 32, 16, 8, 4, 2, 1];
+
+        function init() {
+            map = new BMap.Map("allmap");
+            map.centerAndZoom("佛山", 10);  // 初始化地图,设置中心点坐标和地图级别。
+            map.enableScrollWheelZoom();
+
+            map.addControl(new BMap.PanoramaControl());
+            map.addControl(new BMap.NavigationControl());
+            map.addControl(new BMap.ScaleControl());
+            map.addControl(new BMap.ScaleControl({ anchor: BMAP_ANCHOR_BOTTOM_LEFT }));
+            map.addControl(new BMap.MapTypeControl({ anchor: BMAP_ANCHOR_TOP_RIGHT }));
+
+            var tileLayer = new BMap.TileLayer({ isTransparentPng: true });
+            tileLayer.getTilesUrl = function (tileCoord, zoom) {
+                if (zoom >= 10) {
+                    var x = tileCoord.x;
+                    var y = tileCoord.y;
+
+                    if (x < 0) {
+                        x = 'M' + (-x);
+                    }
+                    if (y < 0) {
+                        y = 'M' + (-y);
+                    }
+                    //根据瓦片的文件路径拼接URL
+                    var url = 'testtiles/' + zoom + '/' + x + '_' + y + '.png';
+                    return url;
+                }
+            }
+            map.addTileLayer(tileLayer);
+        }
+
+        function containsExtent(extent1, extent2) {
+            return extent1[0] <= extent2[0] && extent2[2] <= extent1[2] &&
+                    extent1[1] <= extent2[1] && extent2[3] <= extent1[3];
+        }
+
+        window.onload = function () {
+            init();
+        }
+
+        //百度地图坐标转换
+        var BaiduPointConvert = function (map) {
+            this.map = map;
+            //瓦片xy计算出经纬度坐标
+            //step1: this.tileToPixel(pixel);百度地图瓦片大小为 256*256，根据 瓦片xy * 256计算出瓦片的像素坐标；
+            //step2 : this.pixelToWorld(this.tileToPixel(pixel)) ; 将像素坐标转为平面坐标。
+            //step3: this.worldToLngLat(this.pixelToWorld(this.tileToPixel(pixel))); 调用API提供的方法将平面坐标转为经纬度坐标；
+            //API说明请参考：http://developer.baidu.com/map/reference/index.php?title=Class:%E5%9C%B0%E5%9B%BE%E7%B1%BB%E5%9E%8B%E7%B1%BB/Projection
+            this.tileToLngLat = function (pixel) {
+                return this.worldToLngLat(this.pixelToWorld(this.tileToPixel(pixel)));
+            }
+            this.lngLatToTile = function (lngLat) {
+                return this.pixelToTile(this.worldToPixel(this.lngLatToWorld(lngLat)));
+            }
+            this.pixelToLngLat = function (pixel) {
+                return this.worldToLngLat(this.pixelToWorld(pixel));
+            }
+            this.lngLatToPixel = function (lngLat) {
+                return this.worldToPixel(this.lngLatToWorld(lngLat));
+            }
+            this.tileToPixel = function (pixel) {
+                return new BMap.Pixel(pixel.x * 256,
+                    pixel.y * 256);
+            }
+            this.pixelToWorld = function (pixel) {
+                var zoom = this.map.getZoom();
+                return new BMap.Pixel(pixel.x / Math.pow(2, zoom - 18),
+                    pixel.y / Math.pow(2, zoom - 18));
+            }
+            this.worldToLngLat = function (pixel) {
+                var projection = this.map.getMapType().getProjection();
+                return projection.pointToLngLat(pixel)
+            }
+            this.pixelToTile = function (pixel) {
+                return new BMap.Pixel(pixel.x / 256,
+                    pixel.y / 256);
+            }
+            this.worldToPixel = function (pixel) {
+                var zoom = this.map.getZoom();
+                return new BMap.Pixel(pixel.x * Math.pow(2, zoom - 18),
+                    pixel.y * Math.pow(2, zoom - 18));
+            }
+            this.lngLatToWorld = function (lngLat) {
+                var projection = this.map.getMapType().getProjection();
+                return projection.lngLatToPoint(lngLat)
+            }
+        }
+
+</script>
+</body>
+</html>
+
+
+

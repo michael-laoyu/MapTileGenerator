@@ -9,6 +9,10 @@ using System.Threading.Tasks;
 
 namespace MapTileGenerator.Core
 {
+    /// <summary>
+    /// 将瓦片以base64方式存储在sqlite
+    /// 目的：http://www.jianshu.com/p/19e0185380b2
+    /// </summary>
     class SqliteAndBase64OutputStrategy : ITileOutputStrategy
     {
         private string _rootPath;

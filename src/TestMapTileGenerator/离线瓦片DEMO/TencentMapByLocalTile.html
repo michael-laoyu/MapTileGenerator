@@ -1,0 +1,78 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+    <title>TencentMap example</title>
+
+    <link href=".JS/ol3/ol.css" rel="stylesheet" />
+    <script src="JS/ol3/ol-debug.js"></script>
+    <style>
+        .map {
+            width: 100%;
+            height: 300px;
+        }
+    </style>
+</head>
+<body>
+
+    <div id="map"></div>
+
+    <script type="text/javascript">
+
+
+
+        var projection3857 = new ol.proj.get("EPSG:3857");
+        var projection3857Extent = projection3857.getExtent();
+        var mapWidth3857 = ol.extent.getWidth(projection3857.getExtent());
+
+        console.log(projection3857.getExtent());
+        console.log(ol.extent.getTopLeft(projection3857Extent));
+        var resolutions3857 = [156543.03392804097, 78271.51696402048, 39135.75848201024, 19567.87924100512, 9783.93962050256, 4891.96981025128, 2445.98490512564, 1222.99245256282, 611.49622628141, 305.748113140705, 152.8740565703525, 76.43702828517625, 38.21851414258813, 19.109257071294063, 9.554628535647032, 4.777314267823516, 2.388657133911758, 1.194328566955879, 0.5971642834779395]
+
+        //腾讯地图完全遵守TMS规则;
+        var tileGrid = new ol.tilegrid.TileGrid({
+            resolutions: resolutions3857,
+            tileSize: [256, 256],
+            extent: projection3857Extent,
+            origin: ol.extent.getBottomLeft(projection3857Extent), 
+        });
+
+        var tilesource = new ol.source.TileImage({
+            tileUrlFunction: function (tileCoord) {
+                var z = tileCoord[0];
+                var x = tileCoord[1];
+                var y = Math.abs(tileCoord[2]);
+                return "testtiles/tencent_tiles_tms/" + z + "/" + x + "/" + y + ".png" ;
+            },
+            tileGrid: tileGrid,
+            projection: projection3857,
+        });
+
+        var AMap = new ol.layer.Tile({
+            source: tilesource,
+            projection: projection3857,
+        });
+
+        var map = new ol.Map({
+            layers: [
+             AMap,
+                 ////调试瓦片
+                new ol.layer.Tile({
+                    source: new ol.source.TileDebug({
+                        projection: projection3857,
+                        tileGrid: tileGrid
+                    })
+                })
+            ],
+
+            target: 'map',
+            view: new ol.View({
+                center: ol.proj.transform([113.12338829040527, 23.02326293123962], 'EPSG:4326', 'EPSG:3857'),   
+                resulotions: resolutions3857,
+            }),
+        });
+
+        map.getView().setZoom(1);
+
+    </script>
+</body>
+</html>

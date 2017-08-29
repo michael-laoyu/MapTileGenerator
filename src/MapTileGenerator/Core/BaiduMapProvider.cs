@@ -6,7 +6,10 @@ using System.Threading.Tasks;
 
 namespace MapTileGenerator.Core
 {
-    public class BaiduMapProvider : WmsSourceProvider
+    /// <summary>
+    /// 百度地图
+    /// </summary>
+    public class BaiduMapProvider : TmsSourceProvider
     {
         private int offsetZoom;
         public BaiduMapProvider(MapConfig config)
