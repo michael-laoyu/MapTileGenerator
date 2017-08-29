@@ -24,7 +24,9 @@ namespace MapTileGenerator
                 case "tencent":
                     source = new TencentMapProvider(config);
                     break;
-
+                case "tms":
+                    source = new TmsSourceProvider(config);
+                    break;
                 case "wmts" :
                     source = new WmtsSourceProvider(config);
                     break;

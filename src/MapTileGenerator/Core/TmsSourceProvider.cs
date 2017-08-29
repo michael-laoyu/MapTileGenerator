@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace MapTileGenerator.Core
 {
-    public class TmsSourceProvider
+    public class TmsSourceProvider : ISourceProvider
     {
         protected ITileGrid _tileGrid = null;
         protected string _url = null;        
