@@ -30,6 +30,9 @@ namespace MapTileGenerator
                 case "wmts" :
                     source = new WmtsSourceProvider(config);
                     break;
+                case "wmtsxyz":
+                    source = new WmtsXyzTileSourceProvider(config);
+                    break;
                 case "wms":
                     source = new WmsSourceProvider(config);
                     break;

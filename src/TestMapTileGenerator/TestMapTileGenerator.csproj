@@ -52,8 +52,18 @@
       <Name>MapTileGenerator</Name>
     </ProjectReference>
   </ItemGroup>
+  <ItemGroup />
   <ItemGroup>
-    <Folder Include="离线瓦片DEMO\" />
+    <Content Include="离线瓦片DEMO\baiduMapApiByTile.html" />
+    <Content Include="离线瓦片DEMO\GaodeMapByLocalTile.html" />
+    <Content Include="离线瓦片DEMO\js\coordTransform.js" />
+    <Content Include="离线瓦片DEMO\js\ol3\ol-debug.js" />
+    <Content Include="离线瓦片DEMO\js\ol3\ol-deps.js" />
+    <Content Include="离线瓦片DEMO\js\ol3\ol.css" />
+    <Content Include="离线瓦片DEMO\js\ol3\ol.js" />
+    <Content Include="离线瓦片DEMO\js\ol3\proj4.js" />
+    <Content Include="离线瓦片DEMO\TencentMapByLocalTile.html" />
+    <Content Include="离线瓦片DEMO\tiandituRasterLocalMap.html" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

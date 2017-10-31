@@ -81,6 +81,7 @@
     <Compile Include="Core\SqliteOutputStrategy.cs" />
     <Compile Include="Core\TencentMapProvider.cs" />
     <Compile Include="Core\TmsSourceProvider.cs" />
+    <Compile Include="Core\WmtsXyzTileSourceProvider.cs" />
     <Compile Include="ProviderFactory.cs" />
     <Compile Include="Core\WmtsSourceProvider.cs" />
     <Compile Include="Core\WmtsTileGrid.cs" />

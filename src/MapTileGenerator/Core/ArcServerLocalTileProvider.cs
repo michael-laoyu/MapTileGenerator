@@ -6,6 +6,11 @@ using System.Threading.Tasks;
 
 namespace MapTileGenerator.Core
 {
+    /// <summary>
+    /// ArcServer本地缓存瓦片转换。ArcServer的本地缓存的瓦片的命名不太规则，且盗版的ArcGIS涉及版权风险。
+    /// 
+    /// PS: 目的是为了规避风险，将瓦片全部重命名
+    /// </summary>
     public class ArcServerLocalTileProvider : WmtsSourceProvider 
     {
         private int offsetZoom;

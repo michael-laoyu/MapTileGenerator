@@ -7,13 +7,12 @@ using System.Threading.Tasks;
 namespace MapTileGenerator.Core
 {
     /// <summary>
-    /// 腾讯地图
+    /// 腾讯地图，TMS瓦片规则
     /// </summary>
     public class TencentMapProvider : TmsSourceProvider
     {
         public TencentMapProvider(MapConfig config) : base(config)
         {
         }
-
     }
 }

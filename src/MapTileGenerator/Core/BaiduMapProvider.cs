@@ -8,6 +8,8 @@ namespace MapTileGenerator.Core
 {
     /// <summary>
     /// 百度地图
+    /// 
+    /// 符合TMS瓦片规则，特殊之处只是Origin在[0，0]，标准的TMS的Origin在extent的左下角
     /// </summary>
     public class BaiduMapProvider : TmsSourceProvider
     {

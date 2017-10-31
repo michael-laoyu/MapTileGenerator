@@ -6,6 +6,9 @@ using System.Threading.Tasks;
 
 namespace MapTileGenerator.Core
 {
+    /// <summary>
+    /// 较通用的，基于TMS规则的XYZ瓦片下载
+    /// </summary>
     public class TmsSourceProvider : ISourceProvider
     {
         protected ITileGrid _tileGrid = null;
